@@ -6,15 +6,13 @@ import { Button3D } from '../ui/Button3D';
 import { StaggerContainer } from '../transitions/StaggerContainer';
 import { 
   Play, 
-  Bot, 
   Users, 
   Puzzle, 
-  BookOpen, 
-  ShieldCheck, 
-  Cpu, 
+  GraduationCap, 
   Sparkles,
-  ChevronRight
+  Palette
 } from 'lucide-react';
+import { useNavigationStore } from '../../store/navigationStore';
 
 interface HeroSectionProps {
   onNavigate: (page: NavPage) => void;
@@ -22,17 +20,12 @@ interface HeroSectionProps {
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
   const { setGameMode, resetGame, setTwoPlayerSetupOpen } = useGameStore();
+  const { openThemesModal } = useNavigationStore();
 
   const handlePlayNow = () => {
-    setGameMode('vs_ai');
+    setGameMode('play');
     resetGame();
     onNavigate('play');
-  };
-
-  const handlePlayAI = () => {
-    setGameMode('vs_ai');
-    resetGame();
-    onNavigate('ai');
   };
 
   const handleLocal2P = () => {
@@ -64,64 +57,67 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
 
         {/* Hero Title */}
         <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-neutral-100 font-display max-w-3xl leading-[1.08] drop-shadow-2xl">
-          MASTER THE BOARD.
+          CHESSVERSE <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-500">3D</span>
         </h1>
 
         {/* Subtitle */}
         <p className="text-base sm:text-xl text-neutral-300 max-w-xl mt-3 font-normal leading-relaxed drop-shadow">
-          Experience chess in a new dimension. Precision physics, intelligent AI engine, interactive puzzles, and cinematic 3D realism.
+          Master the board. Enter another dimension.
         </p>
 
-        {/* Primary Call to Action Buttons */}
-        <div className="flex flex-wrap items-center justify-center gap-3.5 mt-8 w-full max-w-md">
+        {/* Primary Command Grid: PLAY, 2 PLAYER, LEARN CHESS, PUZZLES */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mt-8 w-full max-w-lg">
           <Button3D
             variant="primary"
             size="lg"
             onClick={handlePlayNow}
             icon={<Play className="w-4 h-4 fill-current" />}
-            className="flex-1 min-w-[160px]"
+            className="w-full"
           >
-            PLAY NOW
+            PLAY
           </Button3D>
 
           <Button3D
             variant="secondary"
             size="lg"
-            onClick={handlePlayAI}
-            icon={<Bot className="w-4 h-4 text-amber-400" />}
-            className="flex-1 min-w-[160px]"
-          >
-            PLAY VS AI
-          </Button3D>
-        </div>
-
-        {/* Secondary Mode Direct Links with 3D button interactions */}
-        <div className="flex flex-wrap items-center justify-center gap-2.5 mt-5 text-xs font-medium text-neutral-400">
-          <Button3D
-            variant="secondary"
-            size="sm"
-            onClick={handleLocal2P}
-            icon={<Users className="w-3.5 h-3.5 text-cyan-400" />}
+            onClick={() => onNavigate('2player')}
+            icon={<Users className="w-4 h-4 text-sky-400" />}
+            className="w-full border-sky-500/30 text-neutral-100"
           >
             2 PLAYER
           </Button3D>
 
           <Button3D
             variant="secondary"
-            size="sm"
-            onClick={() => onNavigate('puzzles')}
-            icon={<Puzzle className="w-3.5 h-3.5 text-emerald-400" />}
+            size="lg"
+            onClick={() => onNavigate('learn')}
+            icon={<GraduationCap className="w-4 h-4 text-purple-400" />}
+            className="w-full border-purple-500/30 text-neutral-100"
           >
-            PUZZLES
+            LEARN CHESS
           </Button3D>
 
           <Button3D
             variant="secondary"
-            size="sm"
-            onClick={() => onNavigate('learn')}
-            icon={<BookOpen className="w-3.5 h-3.5 text-purple-400" />}
+            size="lg"
+            onClick={() => onNavigate('puzzles')}
+            icon={<Puzzle className="w-4 h-4 text-emerald-400" />}
+            className="w-full border-emerald-500/30 text-neutral-100"
           >
-            LEARN CHESS
+            PUZZLES
+          </Button3D>
+        </div>
+
+        {/* Board Themes Studio Quick Link */}
+        <div className="flex items-center justify-center mt-4">
+          <Button3D
+            variant="ghost"
+            size="sm"
+            onClick={openThemesModal}
+            icon={<Palette className="w-3.5 h-3.5 text-amber-400" />}
+            className="text-xs text-amber-300/80 hover:text-amber-300 border border-amber-500/20 hover:border-amber-500/40 bg-neutral-900/50"
+          >
+            CUSTOMIZE BOARD & PIECE THEMES
           </Button3D>
         </div>
       </StaggerContainer>
@@ -131,11 +127,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
         <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 text-left">
           <div className="flex items-start gap-3">
             <div className="p-2 rounded-lg bg-neutral-900 border border-neutral-800 text-amber-400">
-              <Cpu className="w-4 h-4" />
+              <GraduationCap className="w-4 h-4" />
             </div>
             <div>
-              <h4 className="text-xs font-bold text-neutral-200 uppercase">Async AI Engine</h4>
-              <p className="text-[11px] text-neutral-400 mt-0.5">5 calibrated skill levels with positional search</p>
+              <h4 className="text-xs font-bold text-neutral-200 uppercase">3D Academy</h4>
+              <p className="text-[11px] text-neutral-400 mt-0.5">Interactive lessons, practice drills & tactics</p>
             </div>
           </div>
 
@@ -151,11 +147,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
 
           <div className="flex items-start gap-3">
             <div className="p-2 rounded-lg bg-neutral-900 border border-neutral-800 text-emerald-400">
-              <ShieldCheck className="w-4 h-4" />
+              <Users className="w-4 h-4" />
             </div>
             <div>
-              <h4 className="text-xs font-bold text-neutral-200 uppercase">FIDE Rule Engine</h4>
-              <p className="text-[11px] text-neutral-400 mt-0.5">En passant, castling, promotion & draw checks</p>
+              <h4 className="text-xs font-bold text-neutral-200 uppercase">Pass & Play 2P</h4>
+              <p className="text-[11px] text-neutral-400 mt-0.5">Local 2-player battles with customizable clocks</p>
             </div>
           </div>
 

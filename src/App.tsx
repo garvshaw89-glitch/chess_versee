@@ -7,11 +7,12 @@ import React from 'react';
 import { Navbar, NavPage } from './components/ui/Navbar';
 import { HeroSection } from './components/landing/HeroSection';
 import { PlayView } from './pages/PlayView';
-import { VsAiView } from './pages/VsAiView';
+import { TwoPlayerView } from './pages/TwoPlayerView';
 import { PuzzlesView } from './pages/PuzzlesView';
 import { LearnView } from './pages/LearnView';
 import { ProfileView } from './pages/ProfileView';
 import { SettingsModal } from './components/ui/SettingsModal';
+import { BoardThemesModal } from './components/ui/BoardThemesModal';
 import { TwoPlayerSetupModal } from './components/ui/TwoPlayerSetupModal';
 import { ToastNotification } from './components/ui/ToastNotification';
 import { useNavigationStore } from './store/navigationStore';
@@ -24,7 +25,10 @@ export default function App() {
     navigateWithTransition, 
     settingsOpen, 
     openSettings, 
-    closeSettings 
+    closeSettings,
+    themesModalOpen,
+    openThemesModal,
+    closeThemesModal
   } = useNavigationStore();
 
   return (
@@ -34,6 +38,7 @@ export default function App() {
         currentPage={currentPage}
         onNavigate={navigateWithTransition}
         onOpenSettings={openSettings}
+        onOpenThemes={openThemesModal}
       />
 
       {/* Main Page Routing with 3D Page Transition System */}
@@ -43,8 +48,8 @@ export default function App() {
           {currentPage === 'play' && (
             <PlayView onNavigate={navigateWithTransition} onOpenSettings={openSettings} />
           )}
-          {currentPage === 'ai' && (
-            <VsAiView onNavigate={navigateWithTransition} onOpenSettings={openSettings} />
+          {currentPage === '2player' && (
+            <TwoPlayerView onNavigate={navigateWithTransition} onOpenSettings={openSettings} />
           )}
           {currentPage === 'puzzles' && (
             <PuzzlesView onNavigate={navigateWithTransition} onOpenSettings={openSettings} />
@@ -62,6 +67,7 @@ export default function App() {
       {/* Persistent Floating Controls & 3D Modals */}
       <TwoPlayerSetupModal onStartPlaying={() => navigateWithTransition('play')} />
       <SettingsModal isOpen={settingsOpen} onClose={closeSettings} />
+      <BoardThemesModal isOpen={themesModalOpen} onClose={closeThemesModal} />
       <ToastNotification />
     </div>
   );

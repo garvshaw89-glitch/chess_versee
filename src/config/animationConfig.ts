@@ -50,12 +50,12 @@ export const ANIMATION_CONFIG = {
       tagline: 'PREPARE YOUR FIRST MOVE',
       cameraPreset: 'player_w' as const,
     },
-    ai: {
-      label: 'Calibrating Neural Engine',
-      symbol: '♞',
-      pieceName: 'Knight',
-      accentColor: '#06b6d4', // cyan-500
-      tagline: 'CALCULATING POSITIONAL DEPTH',
+    '2player': {
+      label: 'Setting Up 2-Player Battlefield',
+      symbol: '⚔',
+      pieceName: 'Swords',
+      accentColor: '#38bdf8', // sky-400
+      tagline: 'PASS & PLAY ON ONE DEVICE',
       cameraPreset: 'player_w' as const,
     },
     puzzles: {

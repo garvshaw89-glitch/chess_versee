@@ -52,7 +52,7 @@ export const AnimatedPiece: React.FC<AnimatedPieceProps> = ({
     if (!groupRef.current) return;
 
     if (isMoving.current) {
-      moveProgress.current = Math.min(1, moveProgress.current + delta * 3.8);
+      moveProgress.current = Math.min(1, moveProgress.current + delta * 3.6);
       const t = moveProgress.current;
 
       // Smooth step
@@ -60,22 +60,35 @@ export const AnimatedPiece: React.FC<AnimatedPieceProps> = ({
       const currentX = THREE.MathUtils.lerp(prevCoords.current[0], targetX, ease);
       const currentZ = THREE.MathUtils.lerp(prevCoords.current[1], targetZ, ease);
 
-      // Parabolic arc lift during transit
-      const arcHeight = Math.sin(t * Math.PI) * 0.8;
-      const targetY = (isSelected ? 0.4 : 0) + arcHeight;
+      // Parabolic arc lift during transit: lift -> move -> settle
+      const arcHeight = Math.sin(t * Math.PI) * 0.85;
+      const targetY = (isSelected ? 0.42 : 0) + arcHeight;
 
       groupRef.current.position.set(currentX, targetY, currentZ);
+
+      // Dynamic physical tilt in travel direction during flight
+      const dx = targetX - prevCoords.current[0];
+      const dz = targetZ - prevCoords.current[1];
+      const tiltMagnitude = Math.sin(t * Math.PI) * 0.12;
+      groupRef.current.rotation.z = -dx * tiltMagnitude;
+      groupRef.current.rotation.x = dz * tiltMagnitude;
 
       if (t >= 1) {
         isMoving.current = false;
         prevCoords.current = [targetX, targetZ];
+        groupRef.current.rotation.set(0, 0, 0);
       }
     } else {
-      // Resting position with lift on selection
-      const targetY = isSelected ? 0.42 : isHovered ? 0.12 : 0;
+      // Resting position with lift and subtle breathing bob on selection
+      const bob = isSelected ? Math.sin(performance.now() * 0.005) * 0.04 : 0;
+      const targetY = isSelected ? 0.42 + bob : isHovered ? 0.12 : 0;
       groupRef.current.position.x = THREE.MathUtils.lerp(groupRef.current.position.x, targetX, 0.2);
       groupRef.current.position.z = THREE.MathUtils.lerp(groupRef.current.position.z, targetZ, 0.2);
       groupRef.current.position.y = THREE.MathUtils.lerp(groupRef.current.position.y, targetY, 0.2);
+
+      // Smoothly return rotation to zero
+      groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, 0, 0.2);
+      groupRef.current.rotation.z = THREE.MathUtils.lerp(groupRef.current.rotation.z, 0, 0.2);
     }
   });
 

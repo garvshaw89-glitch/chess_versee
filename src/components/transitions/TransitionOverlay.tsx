@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigationStore } from '../../store/navigationStore';
 import { ANIMATION_CONFIG, prefersReducedMotion } from '../../config/animationConfig';
-import { Sparkles, Shield, Cpu, Target, BookOpen, User, Flame } from 'lucide-react';
+import { Sparkles, Shield, Users, Target, GraduationCap, User, Flame } from 'lucide-react';
 
 export const TransitionOverlay: React.FC = () => {
   const { isTransitioning, transitionPhase, targetPage } = useNavigationStore();
@@ -9,17 +9,17 @@ export const TransitionOverlay: React.FC = () => {
   if (!isTransitioning && transitionPhase === 'idle') return null;
 
   const reducedMotion = prefersReducedMotion();
-  const theme = targetPage ? ANIMATION_CONFIG.pageThemes[targetPage] : null;
+  const theme = targetPage ? (ANIMATION_CONFIG.pageThemes as any)[targetPage] : null;
 
   // Icon mapping for high-tech HUD in transition
   const getContextIcon = () => {
     switch (targetPage) {
-      case 'ai':
-        return <Cpu className="w-8 h-8 text-cyan-400 animate-pulse" />;
+      case '2player':
+        return <Users className="w-8 h-8 text-sky-400 animate-pulse" />;
       case 'puzzles':
         return <Target className="w-8 h-8 text-emerald-400 animate-spin" style={{ animationDuration: '6s' }} />;
       case 'learn':
-        return <BookOpen className="w-8 h-8 text-purple-400 animate-bounce" />;
+        return <GraduationCap className="w-8 h-8 text-purple-400 animate-bounce" />;
       case 'profile':
         return <User className="w-8 h-8 text-amber-400" />;
       case 'play':

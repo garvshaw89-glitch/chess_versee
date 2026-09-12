@@ -381,6 +381,63 @@ class SoundSynthesizer {
       glass.stop(now + 0.4);
     } catch {}
   }
+
+  /**
+   * Tactical success / puzzle / quiz correct chime
+   */
+  public playSuccess() {
+    if (!this.enabled) return;
+    try {
+      this.initContext();
+      if (!this.ctx || !this.masterGain) return;
+      const now = this.ctx.currentTime;
+      // Rising arpeggio: C5 -> G5
+      const freqs = [523.25, 783.99];
+      freqs.forEach((f, idx) => {
+        const osc = this.ctx!.createOscillator();
+        const gain = this.ctx!.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(f, now + idx * 0.08);
+        gain.gain.setValueAtTime(0.25, now + idx * 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.35);
+        osc.connect(gain);
+        gain.connect(this.masterGain!);
+        osc.start(now + idx * 0.08);
+        osc.stop(now + idx * 0.08 + 0.35);
+      });
+    } catch {}
+  }
+
+  public playWin() {
+    this.playCheckmate();
+  }
+
+  public playCelebration() {
+    this.playCheckmate();
+  }
+
+  /**
+   * Mistake / quiz incorrect error buzz
+   */
+  public playError() {
+    if (!this.enabled) return;
+    try {
+      this.initContext();
+      if (!this.ctx || !this.masterGain) return;
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(160, now);
+      osc.frequency.linearRampToValueAtTime(110, now + 0.15);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+      osc.connect(gain);
+      gain.connect(this.masterGain);
+      osc.start(now);
+      osc.stop(now + 0.15);
+    } catch {}
+  }
 }
 
 export const soundService = new SoundSynthesizer();

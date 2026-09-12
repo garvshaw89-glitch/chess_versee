@@ -11,16 +11,19 @@ import {
   VolumeX, 
   Settings, 
   Layers,
-  Sparkles
+  Sparkles,
+  Palette
 } from 'lucide-react';
 import { CameraPreset } from '../../types/chess';
 import { Button3D } from './Button3D';
+import { useNavigationStore } from '../../store/navigationStore';
 
 interface GameControlsBarProps {
   onOpenSettings: () => void;
 }
 
 export const GameControlsBar: React.FC<GameControlsBarProps> = ({ onOpenSettings }) => {
+  const { openThemesModal } = useNavigationStore();
   const {
     undoMove,
     resetGame,
@@ -132,6 +135,17 @@ export const GameControlsBar: React.FC<GameControlsBarProps> = ({ onOpenSettings
           icon={<Layers className="w-3.5 h-3.5 text-cyan-400" />}
         >
           <span className="font-mono text-[11px] font-bold">{graphics.viewMode.toUpperCase()}</span>
+        </Button3D>
+
+        {/* Board & Piece Themes Button */}
+        <Button3D
+          variant="secondary"
+          size="sm"
+          onClick={openThemesModal}
+          title="Customize Board & 3D Piece Themes"
+          icon={<Palette className="w-3.5 h-3.5 text-amber-400" />}
+        >
+          <span className="hidden sm:inline">Themes</span>
         </Button3D>
 
         {/* Sound Toggle */}

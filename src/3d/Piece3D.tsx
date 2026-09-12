@@ -33,10 +33,17 @@ function getPieceMaterials(color: PieceColor, theme: PieceThemeId, isSelected?: 
       break;
 
     case 'marble':
-      diffuseColor = isWhite ? '#f8f8f8' : '#141416';
-      roughness = 0.15;
-      metalness = 0.05;
-      clearcoat = 0.6;
+      diffuseColor = isWhite ? '#fcfbf9' : '#121417';
+      roughness = 0.12;
+      metalness = 0.04;
+      clearcoat = 0.85;
+      break;
+
+    case 'minimalist':
+      diffuseColor = isWhite ? '#f3f4f6' : '#18181b';
+      roughness = 0.22;
+      metalness = 0.08;
+      clearcoat = 0.55;
       break;
 
     case 'metal':
@@ -98,6 +105,24 @@ export const Piece3D: React.FC<Piece3DProps> = ({
   // High quality geometry groups per piece type
   switch (type) {
     case 'p': // PAWN
+      if (theme === 'minimalist') {
+        return (
+          <group>
+            <mesh position={[0, 0.12, 0]} castShadow receiveShadow>
+              <cylinderGeometry args={[0.3, 0.35, 0.24, 32]} />
+              <meshPhysicalMaterial {...matProps} />
+            </mesh>
+            <mesh position={[0, 0.45, 0]} castShadow receiveShadow>
+              <cylinderGeometry args={[0.18, 0.26, 0.44, 32]} />
+              <meshPhysicalMaterial {...matProps} />
+            </mesh>
+            <mesh position={[0, 0.8, 0]} castShadow>
+              <sphereGeometry args={[0.22, 32, 32]} />
+              <meshPhysicalMaterial {...matProps} />
+            </mesh>
+          </group>
+        );
+      }
       return (
         <group>
           {/* Base */}
@@ -129,6 +154,24 @@ export const Piece3D: React.FC<Piece3DProps> = ({
       );
 
     case 'r': // ROOK
+      if (theme === 'minimalist') {
+        return (
+          <group>
+            <mesh position={[0, 0.12, 0]} castShadow receiveShadow>
+              <boxGeometry args={[0.68, 0.24, 0.68]} />
+              <meshPhysicalMaterial {...matProps} />
+            </mesh>
+            <mesh position={[0, 0.54, 0]} castShadow receiveShadow>
+              <boxGeometry args={[0.54, 0.6, 0.54]} />
+              <meshPhysicalMaterial {...matProps} />
+            </mesh>
+            <mesh position={[0, 0.92, 0]} castShadow>
+              <boxGeometry args={[0.62, 0.18, 0.62]} />
+              <meshPhysicalMaterial {...matProps} />
+            </mesh>
+          </group>
+        );
+      }
       return (
         <group>
           {/* Base */}
@@ -159,6 +202,24 @@ export const Piece3D: React.FC<Piece3DProps> = ({
       );
 
     case 'n': // KNIGHT
+      if (theme === 'minimalist') {
+        return (
+          <group rotation={[0, color === 'w' ? 0 : Math.PI, 0]}>
+            <mesh position={[0, 0.12, 0]} castShadow receiveShadow>
+              <cylinderGeometry args={[0.32, 0.38, 0.24, 32]} />
+              <meshPhysicalMaterial {...matProps} />
+            </mesh>
+            <mesh position={[0, 0.52, -0.04]} rotation={[0.25, 0, 0]} castShadow receiveShadow>
+              <boxGeometry args={[0.32, 0.58, 0.42]} />
+              <meshPhysicalMaterial {...matProps} />
+            </mesh>
+            <mesh position={[0, 0.86, 0.08]} rotation={[-0.3, 0, 0]} castShadow>
+              <boxGeometry args={[0.28, 0.32, 0.46]} />
+              <meshPhysicalMaterial {...matProps} />
+            </mesh>
+          </group>
+        );
+      }
       return (
         <group rotation={[0, color === 'w' ? 0 : Math.PI, 0]}>
           {/* Base */}
@@ -199,6 +260,24 @@ export const Piece3D: React.FC<Piece3DProps> = ({
       );
 
     case 'b': // BISHOP
+      if (theme === 'minimalist') {
+        return (
+          <group>
+            <mesh position={[0, 0.12, 0]} castShadow receiveShadow>
+              <cylinderGeometry args={[0.32, 0.38, 0.24, 32]} />
+              <meshPhysicalMaterial {...matProps} />
+            </mesh>
+            <mesh position={[0, 0.58, 0]} castShadow receiveShadow>
+              <cylinderGeometry args={[0.18, 0.28, 0.68, 32]} />
+              <meshPhysicalMaterial {...matProps} />
+            </mesh>
+            <mesh position={[0, 1.05, 0]} rotation={[0.35, 0, 0]} castShadow>
+              <coneGeometry args={[0.22, 0.46, 32]} />
+              <meshPhysicalMaterial {...matProps} />
+            </mesh>
+          </group>
+        );
+      }
       return (
         <group>
           {/* Base */}
@@ -235,6 +314,28 @@ export const Piece3D: React.FC<Piece3DProps> = ({
       );
 
     case 'q': // QUEEN
+      if (theme === 'minimalist') {
+        return (
+          <group>
+            <mesh position={[0, 0.12, 0]} castShadow receiveShadow>
+              <cylinderGeometry args={[0.38, 0.44, 0.24, 32]} />
+              <meshPhysicalMaterial {...matProps} />
+            </mesh>
+            <mesh position={[0, 0.68, 0]} castShadow receiveShadow>
+              <cylinderGeometry args={[0.22, 0.32, 0.88, 32]} />
+              <meshPhysicalMaterial {...matProps} />
+            </mesh>
+            <mesh position={[0, 1.18, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+              <torusGeometry args={[0.24, 0.05, 16, 32]} />
+              <meshPhysicalMaterial {...matProps} />
+            </mesh>
+            <mesh position={[0, 1.25, 0]} castShadow>
+              <sphereGeometry args={[0.15, 32, 32]} />
+              <meshPhysicalMaterial {...matProps} />
+            </mesh>
+          </group>
+        );
+      }
       return (
         <group>
           {/* Base */}
@@ -281,6 +382,32 @@ export const Piece3D: React.FC<Piece3DProps> = ({
       );
 
     case 'k': // KING
+      if (theme === 'minimalist') {
+        return (
+          <group>
+            <mesh position={[0, 0.12, 0]} castShadow receiveShadow>
+              <cylinderGeometry args={[0.4, 0.46, 0.24, 32]} />
+              <meshPhysicalMaterial {...matProps} />
+            </mesh>
+            <mesh position={[0, 0.74, 0]} castShadow receiveShadow>
+              <cylinderGeometry args={[0.25, 0.34, 1.0, 32]} />
+              <meshPhysicalMaterial {...matProps} />
+            </mesh>
+            <mesh position={[0, 1.3, 0]} castShadow>
+              <cylinderGeometry args={[0.36, 0.26, 0.16, 32]} />
+              <meshPhysicalMaterial {...matProps} />
+            </mesh>
+            <mesh position={[0, 1.48, 0]} castShadow>
+              <boxGeometry args={[0.1, 0.22, 0.1]} />
+              <meshPhysicalMaterial {...matProps} />
+            </mesh>
+            <mesh position={[0, 1.5, 0]} castShadow>
+              <boxGeometry args={[0.22, 0.08, 0.1]} />
+              <meshPhysicalMaterial {...matProps} />
+            </mesh>
+          </group>
+        );
+      }
       return (
         <group>
           {/* Base */}

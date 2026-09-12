@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { Chess, Square } from 'chess.js';
 import { 
   GameMode, 
-  AIDifficulty, 
   CameraPreset, 
   MoveRecord, 
   PieceColor, 
@@ -10,7 +9,6 @@ import {
   TimeControlPreset 
 } from '../types/chess';
 import { soundService } from '../services/sound';
-import { AIEngine } from '../services/aiEngine';
 import { StorageService } from '../services/storage';
 
 export const TIME_CONTROL_PRESETS: TimeControlPreset[] = [
@@ -46,9 +44,6 @@ interface GameState {
   };
   isTwoPlayerSetupOpen: boolean;
   autoFlipBoard: boolean;
-  aiDifficulty: AIDifficulty;
-  isAiThinking: boolean;
-  aiThinking: boolean;
   playerColor: PieceColor;
   boardOrientation: PieceColor;
   timeControl: TimeControlPreset;
@@ -91,7 +86,6 @@ interface GameState {
     timeControl?: TimeControlPreset;
     autoFlipBoard?: boolean;
   }) => void;
-  setAIDifficulty: (diff: AIDifficulty) => void;
   setBoardOrientation: (color: PieceColor) => void;
   toggleOrientation: () => void;
   setCameraPreset: (preset: CameraPreset) => void;
@@ -103,8 +97,6 @@ interface GameState {
   loadCustomFen: (fen: string) => void;
   showToast: (message: string, type?: 'info' | 'success' | 'warning' | 'danger') => void;
   tickClock: () => void;
-  triggerAI: () => Promise<void>;
-  setAiDifficulty: (diff: AIDifficulty) => void;
 }
 
 const initialChess = new Chess();
@@ -132,16 +124,13 @@ export const useGameStore = create<GameState>((set, get) => {
     winner: null,
     winReason: '',
 
-    gameMode: 'vs_ai',
+    gameMode: 'local_2p',
     players: {
-      white: 'Player',
-      black: 'DeepAI'
+      white: 'White',
+      black: 'Black'
     },
     isTwoPlayerSetupOpen: false,
     autoFlipBoard: false,
-    aiDifficulty: 'medium',
-    isAiThinking: false,
-    aiThinking: false,
     playerColor: 'w',
     boardOrientation: 'w',
     timeControl: TIME_CONTROL_PRESETS[5], // 5+3 Rapid
@@ -150,10 +139,6 @@ export const useGameStore = create<GameState>((set, get) => {
       losses: 4,
       draws: 1,
       winStreak: 3
-    },
-
-    setAiDifficulty: (diff) => {
-      get().setAIDifficulty(diff);
     },
 
     selectedSquare: null,
@@ -181,12 +166,7 @@ export const useGameStore = create<GameState>((set, get) => {
 
     selectSquare: (sq) => {
       const state = get();
-      if (state.isGameOver || state.viewingMoveIndex !== -1 || state.isAiThinking) return;
-
-      // In vs_ai mode, only let player click pieces of their color
-      if (state.gameMode === 'vs_ai' && state.turn !== state.playerColor) {
-        return;
-      }
+      if (state.isGameOver || state.viewingMoveIndex !== -1) return;
 
       if (!sq) {
         set({ selectedSquare: null, legalMoves: [] });
@@ -242,11 +222,6 @@ export const useGameStore = create<GameState>((set, get) => {
 
       const fromLower = from.toLowerCase() as Square;
       const toLower = to.toLowerCase() as Square;
-
-      // In vs_ai mode, only let player make a move when it's their turn
-      if (state.gameMode === 'vs_ai' && state.turn !== state.playerColor && !state.isAiThinking) {
-        return false;
-      }
 
       const piece = state.chess.get(fromLower);
       if (!piece || piece.color !== state.chess.turn()) {
@@ -384,16 +359,6 @@ export const useGameStore = create<GameState>((set, get) => {
           promotionPending: null
         });
 
-        // Trigger AI if game is active and it's AI's turn
-        if (
-          state.gameMode === 'vs_ai' &&
-          !isCheckmate &&
-          !isDraw &&
-          state.chess.turn() !== state.playerColor
-        ) {
-          get().triggerAI();
-        }
-
         // In 2-player pass & play, rotate board if auto-flip is enabled
         if (state.gameMode === 'local_2p' && state.autoFlipBoard && !isCheckmate && !isDraw) {
           const nextTurn = state.chess.turn() as PieceColor;
@@ -416,36 +381,13 @@ export const useGameStore = create<GameState>((set, get) => {
       set({ promotionPending: null, selectedSquare: null, legalMoves: [] });
     },
 
-    triggerAI: async () => {
-      set({ isAiThinking: true, aiThinking: true });
-      const currentFen = get().chess.fen();
-      const diff = get().aiDifficulty;
-
-      try {
-        const result = await AIEngine.calculateBestMove(currentFen, diff);
-        set({ isAiThinking: false, aiThinking: false });
-
-        if (result && !get().isGameOver) {
-          get().makeMove(result.from, result.to, result.promotion);
-        }
-      } catch (err) {
-        console.error('AI calculation failed:', err);
-        set({ isAiThinking: false, aiThinking: false });
-      }
-    },
-
     undoMove: () => {
       const state = get();
-      if (state.history.length === 0 || state.isAiThinking) return;
+      if (state.history.length === 0) return;
 
-      // In vs AI mode, undo 2 moves (AI move and player move)
-      const stepsToUndo = state.gameMode === 'vs_ai' && state.history.length >= 2 ? 2 : 1;
+      state.chess.undo();
 
-      for (let i = 0; i < stepsToUndo; i++) {
-        state.chess.undo();
-      }
-
-      const updatedHistory = state.history.slice(0, state.history.length - stepsToUndo);
+      const updatedHistory = state.history.slice(0, state.history.length - 1);
       const last = updatedHistory[updatedHistory.length - 1];
 
       set({
@@ -495,17 +437,11 @@ export const useGameStore = create<GameState>((set, get) => {
         blackTime: initialSeconds,
         clockActive: false,
         promotionPending: null,
-        viewingMoveIndex: -1,
-        isAiThinking: false
+        viewingMoveIndex: -1
       });
 
       soundService.playGameStart();
       get().showToast('New game started', 'info');
-
-      // If playing as black vs AI, trigger AI first move
-      if (get().gameMode === 'vs_ai' && get().playerColor === 'b') {
-        get().triggerAI();
-      }
     },
 
     setTwoPlayerSetupOpen: (isTwoPlayerSetupOpen) => {
@@ -553,23 +489,10 @@ export const useGameStore = create<GameState>((set, get) => {
             black: currentPlayers.black === 'DeepAI' ? 'Player 2' : currentPlayers.black
           }
         });
-      } else if (gameMode === 'vs_ai') {
-        set({
-          gameMode,
-          players: {
-            white: get().playerColor === 'w' ? 'You' : 'DeepAI',
-            black: get().playerColor === 'b' ? 'You' : 'DeepAI'
-          }
-        });
       } else {
         set({ gameMode });
       }
       get().resetGame();
-    },
-
-    setAIDifficulty: (aiDifficulty) => {
-      set({ aiDifficulty });
-      get().showToast(`AI difficulty set to ${String(aiDifficulty).toUpperCase()}`, 'info');
     },
 
     setBoardOrientation: (boardOrientation) => {
@@ -625,44 +548,17 @@ export const useGameStore = create<GameState>((set, get) => {
       const state = get();
       if (state.isGameOver) return;
 
-      if (state.gameMode === 'vs_ai') {
-        // AI evaluates draw offer based on material and positional evaluation
-        const evalScore = AIEngine.evaluatePosition(state.fen);
-        const isAiWhite = state.playerColor === 'b';
-        // aiScore: positive means AI is winning, negative means AI is losing
-        const aiScore = isAiWhite ? evalScore : -evalScore;
-
-        // If AI is significantly winning (+200 cp), it rejects.
-        // If AI is losing (<= -100 cp) or dead equal with at least 12 moves played, it accepts.
-        const accept = aiScore <= 50 && state.history.length >= 12;
-        if (accept) {
-          set({
-            isGameOver: true,
-            isDraw: true,
-            winner: 'draw',
-            drawReason: 'Draw by mutual agreement',
-            winReason: 'Draw agreed between players',
-            clockActive: false
-          });
-          StorageService.updateStatsAfterGame('draw');
-          soundService.playMove();
-          get().showToast('AI accepted the draw offer.', 'info');
-        } else {
-          get().showToast('AI declined the draw offer. The battle continues!', 'warning');
-        }
-      } else {
-        // Local 2 player or casual
-        set({
-          isGameOver: true,
-          isDraw: true,
-          winner: 'draw',
-          drawReason: 'Draw by mutual agreement',
-          winReason: `Draw agreed between ${state.players.white} and ${state.players.black}`,
-          clockActive: false
-        });
-        StorageService.updateStatsAfterGame('draw');
-        get().showToast('Game drawn by mutual agreement', 'info');
-      }
+      set({
+        isGameOver: true,
+        isDraw: true,
+        winner: 'draw',
+        drawReason: 'Draw by mutual agreement',
+        winReason: `Draw agreed between ${state.players.white} and ${state.players.black}`,
+        clockActive: false
+      });
+      StorageService.updateStatsAfterGame('draw');
+      soundService.playMove();
+      get().showToast('Game drawn by mutual agreement', 'info');
     },
 
     jumpToMove: (index) => {

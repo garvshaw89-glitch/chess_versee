@@ -1,8 +1,10 @@
-import React, { useState, useMemo, Suspense } from 'react';
+import React, { useState, useMemo, useEffect, useRef, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
+import * as THREE from 'three';
 import { Square } from 'chess.js';
 import { useGameStore } from '../store/gameStore';
 import { useSettingsStore } from '../store/settingsStore';
+import { useDevice, resolveEffectiveTier } from '../services/deviceTier';
 import { Board3D } from './Board3D';
 import { AnimatedPiece } from './AnimatedPiece';
 import { Lighting } from './Lighting';
@@ -51,19 +53,58 @@ export const ChessCanvas: React.FC<ChessCanvasProps> = ({
   } = useGameStore();
 
   const { gameplay, graphics } = useSettingsStore();
+  const device = useDevice();
+  const effectiveTier = resolveEffectiveTier(graphics.quality, device.detectedTier);
+
+  // Compute adaptive DPR based on effective quality tier
+  const dpr = useMemo<[number, number]>(() => {
+    if (effectiveTier === 'low') return [1, 1];
+    if (effectiveTier === 'medium') return [1, Math.min(1.5, device.dpr)];
+    return [1, Math.min(2, device.dpr)];
+  }, [effectiveTier, device.dpr]);
+
+  // Compute particle count based on tier
+  const particleCount = useMemo(() => {
+    if (!graphics.particles || effectiveTier === 'low') return 0;
+    if (effectiveTier === 'medium') return isHeroPreview ? 40 : 25;
+    return isHeroPreview ? 90 : 50;
+  }, [graphics.particles, effectiveTier, isHeroPreview]);
 
   // If user requested 2D mode in settings or WebGL unavailable, render 2D fallback
   if (!webglAvailable || graphics.viewMode === '2d') {
     return <WebGLFallback />;
   }
 
-  // Determine which position to display (live vs history rewind)
+  // Hero preview animated opening moves cycle
+  const [heroFenIndex, setHeroFenIndex] = useState(0);
+  const heroFens = useMemo(() => [
+    'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+    'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
+    'rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2',
+    'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2',
+    'r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3',
+    'r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3',
+    'r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4'
+  ], []);
+
+  useEffect(() => {
+    if (!isHeroPreview) return;
+    const interval = setInterval(() => {
+      setHeroFenIndex((prev) => (prev + 1) % heroFens.length);
+    }, 3800);
+    return () => clearInterval(interval);
+  }, [isHeroPreview, heroFens.length]);
+
+  // Determine which position to display (live vs history rewind vs hero preview)
   const displayFen = useMemo(() => {
+    if (isHeroPreview) {
+      return heroFens[heroFenIndex];
+    }
     if (viewingMoveIndex >= 0 && viewingMoveIndex < history.length) {
       return history[viewingMoveIndex].fen;
     }
     return chess.fen();
-  }, [viewingMoveIndex, history, chess]);
+  }, [isHeroPreview, heroFens, heroFenIndex, viewingMoveIndex, history, chess]);
 
   // Persistent identity map to keep <AnimatedPiece> instances mounted between moves
   const pieceIdentitiesRef = React.useRef<Map<string, { id: string; type: PieceType; color: PieceColor }>>(new Map());
@@ -212,11 +253,14 @@ export const ChessCanvas: React.FC<ChessCanvasProps> = ({
   return (
     <div className="relative w-full h-full select-none overflow-hidden touch-none">
       <Canvas
-        shadows={graphics.shadows}
-        dpr={graphics.quality === 'low' ? [1, 1] : [1, 2]}
+        shadows={graphics.shadows && effectiveTier !== 'low'}
+        dpr={dpr}
+        onCreated={({ gl }) => {
+          gl.shadowMap.type = THREE.PCFShadowMap;
+        }}
         gl={{
-          antialias: graphics.quality !== 'low',
-          powerPreference: 'high-performance',
+          antialias: effectiveTier !== 'low',
+          powerPreference: effectiveTier === 'low' ? 'low-power' : 'high-performance',
           alpha: true
         }}
         camera={{
@@ -227,7 +271,7 @@ export const ChessCanvas: React.FC<ChessCanvasProps> = ({
         }}
       >
         <Suspense fallback={null}>
-          <Lighting theme={gameplay.boardTheme} shadows={graphics.shadows} />
+          <Lighting theme={gameplay.boardTheme} shadows={graphics.shadows && effectiveTier !== 'low'} />
 
           <CameraController
             preset={isHeroPreview ? 'cinematic' : cameraPreset}
@@ -262,7 +306,7 @@ export const ChessCanvas: React.FC<ChessCanvasProps> = ({
             />
           ))}
 
-          {graphics.particles && <AmbientParticles count={isHeroPreview ? 90 : 50} />}
+          {particleCount > 0 && <AmbientParticles count={particleCount} />}
         </Suspense>
       </Canvas>
     </div>

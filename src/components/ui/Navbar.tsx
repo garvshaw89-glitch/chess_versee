@@ -1,41 +1,52 @@
 import React from 'react';
 import { 
   Sword, 
-  Bot, 
+  Users, 
   Puzzle, 
-  BookOpen, 
+  GraduationCap, 
   User, 
   Volume2, 
   VolumeX, 
   Settings,
   Sparkles,
-  ArrowLeft
+  ArrowLeft,
+  Palette
 } from 'lucide-react';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useNavigationStore } from '../../store/navigationStore';
+import { useGameStore } from '../../store/gameStore';
 import { Button3D } from './Button3D';
 
-export type NavPage = 'landing' | 'play' | 'ai' | 'puzzles' | 'learn' | 'profile';
+export type NavPage = 'landing' | 'play' | '2player' | 'learn' | 'puzzles' | 'profile';
 
 interface NavbarProps {
   currentPage: NavPage;
   onNavigate: (page: NavPage) => void;
   onOpenSettings: () => void;
+  onOpenThemes?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   currentPage,
   onNavigate,
-  onOpenSettings
+  onOpenSettings,
+  onOpenThemes
 }) => {
   const { sound, updateSound } = useSettingsStore();
-  const { navigateBack } = useNavigationStore();
+  const { navigateBack, openThemesModal } = useNavigationStore();
+  const { setTwoPlayerSetupOpen } = useGameStore();
+
+  const handleOpenThemes = onOpenThemes || openThemesModal;
+
+  const handleItemClick = (pageId: NavPage) => {
+    onNavigate(pageId);
+  };
 
   const navItems: { id: NavPage; label: string; icon: React.FC<{ className?: string }> }[] = [
     { id: 'play', label: 'Play', icon: Sword },
-    { id: 'ai', label: 'VS AI', icon: Bot },
+    { id: '2player', label: '2 Player', icon: Users },
+    { id: 'learn', label: 'Learn', icon: GraduationCap },
     { id: 'puzzles', label: 'Puzzles', icon: Puzzle },
-    { id: 'learn', label: 'Learn', icon: BookOpen },
     { id: 'profile', label: 'Profile', icon: User }
   ];
 
@@ -91,7 +102,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 key={item.id}
                 variant={isActive ? 'amber' : 'ghost'}
                 size="sm"
-                onClick={() => onNavigate(item.id)}
+                onClick={() => handleItemClick(item.id)}
                 icon={<Icon className={`w-3.5 h-3.5 ${isActive ? 'text-neutral-950' : 'text-neutral-400'}`} />}
                 className={isActive ? 'shadow-md shadow-amber-500/25' : ''}
               >
@@ -101,8 +112,31 @@ export const Navbar: React.FC<NavbarProps> = ({
           })}
         </nav>
 
-        {/* Action Controls (Sound & Settings & Profile) */}
+        {/* Action Controls (Sound & Themes & Settings & Profile) */}
         <div className="flex items-center gap-2">
+          {/* Board & Piece Themes 3D Button */}
+          <Button3D
+            variant="secondary"
+            size="sm"
+            onClick={handleOpenThemes}
+            title="Board & Piece Themes Studio"
+            icon={<Palette className="w-3.5 h-3.5 text-amber-400" />}
+            className="hidden sm:inline-flex text-xs font-semibold text-neutral-200 border-amber-500/30 hover:border-amber-500/60"
+          >
+            <span>Themes</span>
+          </Button3D>
+
+          {/* Mobile Icon Button for Themes */}
+          <Button3D
+            variant="secondary"
+            size="icon"
+            onClick={handleOpenThemes}
+            title="Board & Piece Themes"
+            className="sm:hidden w-8 h-8 !p-0"
+          >
+            <Palette className="w-4 h-4 text-amber-400" />
+          </Button3D>
+
           <Button3D
             variant="secondary"
             size="icon"
@@ -149,7 +183,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           return (
             <button
               key={item.id}
-              onClick={() => onNavigate(item.id)}
+              onClick={() => handleItemClick(item.id)}
               className={`flex flex-col items-center justify-center py-1 px-3 rounded-lg text-[10px] font-medium transition-transform active:scale-95 cursor-pointer ${
                 isActive ? 'text-amber-400 font-bold' : 'text-neutral-400 hover:text-neutral-200'
               }`}

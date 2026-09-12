@@ -15,12 +15,15 @@ interface NavigationState {
   isNavigatingBack: boolean;
   historyStack: NavPage[];
   settingsOpen: boolean;
+  themesModalOpen: boolean;
 
   // Actions
   navigateWithTransition: (target: NavPage, customLabel?: string) => Promise<void>;
   navigateBack: () => void;
   openSettings: () => void;
   closeSettings: () => void;
+  openThemesModal: () => void;
+  closeThemesModal: () => void;
   resetTransitionSafety: () => void;
 }
 
@@ -33,6 +36,17 @@ export const useNavigationStore = create<NavigationState>((set, get) => ({
   isNavigatingBack: false,
   historyStack: ['landing'],
   settingsOpen: false,
+  themesModalOpen: false,
+
+  openThemesModal: () => {
+    soundService.playButton3DPress('secondary');
+    set({ themesModalOpen: true });
+  },
+
+  closeThemesModal: () => {
+    soundService.playClick();
+    set({ themesModalOpen: false });
+  },
 
   openSettings: () => {
     soundService.playButton3DPress('secondary');

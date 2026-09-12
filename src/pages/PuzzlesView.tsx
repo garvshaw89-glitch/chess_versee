@@ -12,7 +12,8 @@ import {
   ChevronRight, 
   Eye, 
   Award,
-  Zap
+  Zap,
+  Lightbulb
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Button3D } from '../components/ui/Button3D';
@@ -168,34 +169,60 @@ export const PuzzlesView: React.FC<PuzzlesViewProps> = ({ onNavigate, onOpenSett
     setCurrentIdx(nextIdx);
   };
 
+  const handleShowHint = () => {
+    const expected = activePuzzle.solution[puzzleStep];
+    if (expected && expected.length >= 2) {
+      const from = expected.slice(0, 2);
+      showToast(`Tactical Hint: Focus on the piece on ${from.toUpperCase()}`, 'info');
+    }
+  };
+
+  // Keyboard navigation for tactical puzzles
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (['input', 'textarea', 'select'].includes((e.target as HTMLElement)?.tagName?.toLowerCase())) return;
+
+      if (e.key === 'r' || e.key === 'R') {
+        handleRestartPuzzle();
+      } else if (e.key === 'n' || e.key === 'N' || (status === 'correct' && (e.key === 'Enter' || e.key === ' '))) {
+        handleNextPuzzle();
+      } else if (e.key === 'h' || e.key === 'H') {
+        handleShowHint();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [status, currentIdx]);
+
   return (
-    <div className="relative w-full h-[calc(100vh-60px)] flex flex-col lg:flex-row overflow-hidden bg-neutral-950">
-      {/* 3D Board Area */}
-      <div className="relative flex-1 h-[55vh] lg:h-full flex flex-col items-center justify-between p-2 sm:p-4 overflow-hidden">
-        {/* Header Ribbon */}
-        <div className="w-full max-w-xl flex items-center justify-between z-10 px-2 py-1">
-          <div className="flex items-center gap-2 bg-neutral-900/80 px-3 py-1.5 rounded-xl border border-neutral-800 backdrop-blur-md">
-            <Puzzle className="w-4 h-4 text-amber-400" />
-            <span className="text-xs font-bold text-neutral-200">{activePuzzle.title}</span>
-            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
-              {activePuzzle.difficulty}
-            </span>
+    <div className="relative w-full h-[calc(100dvh-56px)] md:h-[calc(100dvh-60px)] flex flex-col overflow-hidden bg-neutral-950">
+      <div className="w-full max-w-7xl mx-auto h-full flex flex-col lg:flex-row overflow-hidden flex-1">
+        {/* 3D Board Area */}
+        <div className="relative flex-1 h-[52vh] sm:h-[55vh] lg:h-full flex flex-col items-center justify-between p-1.5 sm:p-4 overflow-hidden min-h-0">
+          {/* Header Ribbon */}
+          <div className="w-full max-w-xl flex items-center justify-between z-10 px-2 py-1 gap-2 flex-wrap">
+            <div className="flex items-center gap-2 bg-neutral-900/80 px-3 py-1.5 rounded-xl border border-neutral-800 backdrop-blur-md">
+              <Puzzle className="w-4 h-4 text-amber-400 shrink-0" />
+              <span className="text-xs font-bold text-neutral-200 truncate max-w-[160px] sm:max-w-none">{activePuzzle.title}</span>
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
+                {activePuzzle.difficulty}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono font-bold text-neutral-300 bg-neutral-900/80 px-3 py-1 rounded-lg border border-neutral-800">
+                Rating: {rating}
+              </span>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-mono font-bold text-neutral-300 bg-neutral-900/80 px-3 py-1 rounded-lg border border-neutral-800">
-              Rating: {rating}
-            </span>
+          {/* 3D Canvas Board */}
+          <div className="relative w-full h-full flex-1 flex items-center justify-center min-h-0 touch-none">
+            <ChessCanvas />
           </div>
-        </div>
 
-        {/* 3D Canvas Board */}
-        <div className="relative w-full h-full flex-1 flex items-center justify-center">
-          <ChessCanvas />
-        </div>
-
-        {/* Bottom banner feedback */}
-        <div className="w-full max-w-xl z-10">
+          {/* Bottom banner feedback */}
+          <div className="w-full max-w-xl z-10 px-1 pb-1 sm:pb-0">
           {status === 'correct' && (
             <div className="flex items-center justify-between p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/50 text-emerald-200 backdrop-blur-md animate-in fade-in">
               <div className="flex items-center gap-2 text-xs font-bold">
@@ -290,13 +317,23 @@ export const PuzzlesView: React.FC<PuzzlesViewProps> = ({ onNavigate, onOpenSett
         </div>
 
         {/* Bottom Actions with 3D button interactions */}
-        <div className="pt-4 border-t border-neutral-800 flex gap-2">
+        <div className="pt-4 border-t border-neutral-800 flex items-center gap-2">
+          <Button3D
+            variant="secondary"
+            size="md"
+            onClick={handleShowHint}
+            icon={<Lightbulb className="w-3.5 h-3.5 text-amber-400" />}
+            title="Reveal tactical hint (Shortcut: H)"
+          >
+            <span className="hidden sm:inline">HINT</span>
+          </Button3D>
           <Button3D
             variant="secondary"
             size="md"
             onClick={handleRestartPuzzle}
             icon={<RotateCw className="w-3.5 h-3.5" />}
             className="flex-1"
+            title="Reset puzzle (Shortcut: R)"
           >
             <span>RESET</span>
           </Button3D>
@@ -306,11 +343,13 @@ export const PuzzlesView: React.FC<PuzzlesViewProps> = ({ onNavigate, onOpenSett
             onClick={handleNextPuzzle}
             icon={<ChevronRight className="w-3.5 h-3.5" />}
             className="flex-1"
+            title="Next puzzle (Shortcut: Space or N)"
           >
-            <span>NEXT PUZZLE</span>
+            <span>NEXT</span>
           </Button3D>
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 };

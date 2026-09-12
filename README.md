@@ -1,100 +1,72 @@
 <div align="center">
 
-<img src="./assets/banner.svg" alt="Chessverse 3D Banner" width="100%" />
-
 # ⚡ CHESSVERSE 3D
-### *Next-Generation 3D WebGL Chess & Real-Time Multiplayer Platform*
+### *Immersive 3D WebGL Chess Universe, Interactive Academy & Local Arena*
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
 [![Three.js](https://img.shields.io/badge/Three.js-WebGL-000000?style=for-the-badge&logo=three.js&logoColor=white)](https://threejs.org/)
 [![Vite](https://img.shields.io/badge/Vite-Bundler-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![TailwindCSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![WebSockets](https://img.shields.io/badge/WebSockets-Real--Time-010101?style=for-the-badge&logo=socketdotio&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
-[![Zero Paid API](https://img.shields.io/badge/API-Zero_Paid_APIs-10B981?style=for-the-badge&logo=checkmarx&logoColor=white)](#-zero-paid-api-guarantee)
 [![License](https://img.shields.io/badge/License-MIT-F59E0B?style=for-the-badge)](LICENSE)
 
 <p align="center">
-  <b>Play in stunning 3D WebGL • Challenge offline Minimax AI • Battle friends online with real-time WebSockets • 100% Free & Self-Contained</b>
+  <b>Cinematic 3D WebGL Chessboard • Tactical Puzzles • Interactive 3D Learning Academy • Local Pass & Play • 100% Free & Self-Contained</b>
 </p>
 
-[🎮 Live Demo](#-quick-start) • [✨ Key Features](#-features) • [🕹️ Game Modes](#-game-modes) • [🤖 Local AI Engine](#-offline-ai-engine) • [🛠️ Tech Stack](#-tech-stack) • [🚀 Quick Start](#-quick-start)
+[🎮 Features](#-features) • [🕹️ Core Modes](#-core-modes) • [🛠️ Tech Stack](#-tech-stack) • [🚀 Quick Start](#-quick-start) • [📐 Responsive Design](#-responsive--device-support) • [🔧 Troubleshooting](#-troubleshooting)
 
 ---
 
 </div>
 
-## 🌟 Highlights
+## 🌟 Features
 
-- 🎲 **Photorealistic 3D Chessboard**: Custom-sculpted procedural 3D chess pieces rendered in WebGL via Three.js and React Three Fiber.
-- 🚀 **Smooth Parabolic Animations**: Dynamic piece lifts and physical arc trajectories during moves, with smooth capture disintegrations.
-- 🎥 **Full Orbit & Perspective Controls**: 360° rotation, pitch tilt, smooth zoom, and instant 2D/3D perspective toggle.
-- 🤖 **Offline Heuristic AI Opponent**: Minimax algorithm with Alpha-Beta pruning, piece-square valuation matrices, and 5 distinct difficulty tiers (Trainee to Grandmaster)—**100% local, no API required**.
-- 🌐 **Real-Time WebSocket Multiplayer**: Low-latency room matchmaking, instant 6-character room codes, live game clocks, chat, and spectator mode.
-- 🎵 **Procedural Web Audio Synthesizer**: Zero audio file downloads—synthesizes sliding, capture, check, and victory chimes directly through the browser's Web Audio API.
-- 📚 **Opening Theory & Puzzle Trainer**: Explore grandmaster opening repertoires (Sicilian, Ruy Lopez, King's Indian) and solve rated tactical puzzles with immediate move validation.
-- 🔒 **Zero Paid APIs / Free Forever**: Entirely self-contained. No third-party API subscriptions, token limits, or ongoing costs.
+- 🎲 **Cinematic 3D Chess World**: Real-time WebGL rendering via Three.js and React Three Fiber with dynamic lighting, soft PCF shadows, reflections, and ambient floating particles.
+- 🚀 **Smooth Parabolic Move Physics**: True 3D arc trajectories with piece-tilt, lift physics, bounce landing damping, and tactile board impact.
+- 🎥 **Dynamic 3D Camera Controls**: Smooth orbital controls, 4 preset camera angles (White, Black, Top-Down 2D, Cinematic Orbit), and seamless camera transitions.
+- 🎓 **Interactive 3D Chess Academy**: Structured curriculum covering Chess Fundamentals, Tactical Patterns, Classic Openings, and Essential Endgames with 3D board focus rings, animated guide arrows, and interactive drill validation.
+- 🧩 **Curated Tactical Puzzles**: Deep tactical challenge library spanning Pins, Forks, Skewers, Discovered Attacks, and Back-Rank Checkmates with move hints and real-time step evaluation.
+- 👥 **Dedicated 2-Player Pass & Play**: Built-in chess clock presets (Bullet, Blitz, Rapid, Classical, Custom Increments), automatic board flip, captured piece graveyard, live material advantages, and full algebraic move log.
+- 🎨 **Board & Piece Customizer Studio**: Live 3D studio previewing multiple board themes (Midnight Onyx, Royal Walnut, Cyber Grid, Classic Tournament, Emerald Forest) and piece materials (Alabaster, Obsidian, Gold Leaf, Brushed Metal).
+- 🎵 **Procedural Web Audio Engine**: Zero external audio downloads. Sliders, piece lifts, captures, checks, promotions, and victories are synthesized dynamically using the Web Audio API.
+- ⚡ **Device Tiering & Adaptive Quality**: Automated benchmark detects low, medium, and high capability devices to adjust shadow maps, particle density, and DPR dynamically for smooth 60 FPS performance.
+- ♿ **Accessibility & Motion Safety**: Full support for `prefers-reduced-motion` to disable aggressive camera movements and parabolic arcs when requested by system preferences.
 
 ---
 
-## 🕹️ Game Modes
+## 🕹️ Core Modes
 
-| Mode | Description | Architecture |
+| Mode | Purpose | Capabilities |
 | :--- | :--- | :--- |
-| **🎮 Pass & Play (Local)** | Play on the same screen or analyze games. Choose from Blitz, Rapid, Bullet, or Fischer increment clocks. | 100% Client-Side (`chess.js`) |
-| **🤖 Vs Computer** | 5 difficulty levels ranging from Trainee (depth 1, intentional blunders) to Grandmaster (depth 4-5, optimal alpha-beta search). | Local Heuristic Minimax Engine |
-| **🌐 Online Multiplayer** | Create or join private rooms with unique room codes. Supports live move streaming, draw offers, resignations, and chat. | WebSocket Server (`server.ts`) |
-| **📖 Opening Explorer** | Master classical and hypermodern chess openings with interactive board setups, move paths, and ECO annotations. | Interactive FEN Lessons |
-| **🧩 Tactical Puzzles** | Rated chess puzzles testing forks, pins, skewers, deflection, and back-rank checkmates. | Move Sequence Validator |
-
----
-
-## 🤖 Offline AI Engine
-
-Unlike cloud-dependent chess platforms, **Chessverse 3D** embeds an optimized, lightweight heuristic chess engine written in TypeScript that runs locally in your browser:
-
-```
-                      [ Root Position (FEN) ]
-                                 │
-              ┌──────────────────┴──────────────────┐
-        [ Alpha-Beta Search ]                 [ Move Ordering ]
-              │                                     │
-   ┌──────────┴──────────┐               ┌──────────┴──────────┐
-[ Material Evaluation ]  [ Positional Tables ]  [ Tactical Blunder Scaling ]
-(P=100, N=320, B=330...) (Center control, ranks) (Difficulty tiers 1-5)
-```
-
-- **Difficulty 1 (Trainee)**: Depth 1 • 450ms thinking delay • 40% blunder frequency
-- **Difficulty 2 (Club Player)**: Depth 2 • 600ms thinking delay • 18% blunder frequency
-- **Difficulty 3 (Candidate Master)**: Depth 3 • 750ms thinking delay • 5% blunder frequency
-- **Difficulty 4 (Master)**: Depth 3 • 1000ms thinking delay • 0% blunder frequency
-- **Difficulty 5 (Grandmaster)**: Depth 4-5 • 1200ms thinking delay • Deep positional evaluation
+| **⚔️ PLAY** | Solo or Practice Chess Sandbox | Complete FIDE rule validation, en passant, castling, pawn promotion modal, interactive move rewind, and FEN/PGN export. |
+| **👥 2 PLAYER** | Local Over-the-Board Play | Dedicated dual-seat layout, customizable dual clocks with Fischer increments, optional board flipping per turn, move-by-move history, and resign/draw options. |
+| **🎓 LEARN CHESS** | Interactive 3D Academy | Multi-chapter interactive lessons with guided board arrows, step-by-step drills, contextual explanations, and persistent progress tracking. |
+| **🧩 PUZZLES** | Tactical Training | Curated rating-tiered puzzles with solution step verification, mistake detection, hint visualization, and solve streak counters. |
+| **👤 PROFILE** | Local Player Records | Displays locally tracked statistics: Games Played, Wins, Losses, Draws, Lessons Completed, Puzzles Solved, Learning Streak, and Course Progress. |
+| **⚙️ SETTINGS** | Engine & Visual Config | Audio volume controls, shadow toggles, particle density, device performance tiers, 2D/3D fallback modes, and theme switchers. |
 
 ---
 
 ## 🛠️ Tech Stack
 
 ```
-Frontend:
-  ├── React 18 (Concurrent Mode, Hooks, Memoization)
-  ├── TypeScript 5 (Strict Type Safety)
-  ├── Vite (Lightning-fast HMR and bundling)
-  ├── Tailwind CSS (Modern utility-first styling)
-  └── Lucide React (Pixel-perfect vector iconography)
+Frontend Architecture:
+  ├── React 18 (Concurrent rendering, Suspense, Custom hooks)
+  ├── TypeScript 5 (Strict type checking, exhaustive enums)
+  ├── Vite (Optimized production asset pipeline)
+  ├── Tailwind CSS (Responsive utility layout)
+  └── Lucide React (Accessible iconography)
 
-3D Graphics & Audio:
-  ├── Three.js (WebGL 3D Rendering)
-  ├── @react-three/fiber (Declarative Three.js in React)
-  ├── @react-three/drei (OrbitControls, Canvas Helpers)
-  └── Web Audio API (Procedural sound synthesizer)
+3D Graphics & Sound:
+  ├── Three.js (r183+ WebGL rendering engine, PCFShadowMap)
+  ├── @react-three/fiber (Declarative 3D scene graph)
+  ├── @react-three/drei (Camera OrbitControls, canvas utilities)
+  └── Web Audio API (Zero-dependency procedural sound synthesizer)
 
-Chess Logic & State:
-  ├── chess.js (FIDE standard rule validation)
-  └── Zustand (Predictable global state management)
-
-Backend & Multiplayer:
-  ├── Node.js + Express (Production static server + REST)
-  └── ws (High-performance WebSocket server on port 3000)
+Chess Engine & Rules:
+  ├── chess.js (Authoritative FIDE chess rule enforcement)
+  └── Zustand (Predictable, atomic global state management)
 ```
 
 ---
@@ -103,7 +75,7 @@ Backend & Multiplayer:
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/) (version 18.0 or later)
-- [npm](https://www.npmjs.com/) or [bun](https://bun.sh/)
+- [npm](https://www.npmjs.com/) (version 9.0 or later)
 
 ### 1. Clone the repository
 ```bash
@@ -116,89 +88,48 @@ cd chessverse-3d
 npm install
 ```
 
-### 3. Start the development server
+### 3. Start development server
 ```bash
 npm run dev
 ```
-Open **http://localhost:3000** in your browser to start playing!
+Open **http://localhost:3000** in your browser.
 
 ### 4. Build for production
 ```bash
 npm run build
-npm start
+npm run preview
 ```
 
 ---
 
-## 📁 Project Architecture
+## 📐 Responsive & Device Support
 
-```
-chessverse-3d/
-├── assets/
-│   └── banner.svg             # Animated 3D Isometric GitHub Banner
-├── public/
-│   └── banner.svg             # Web-accessible banner asset
-├── server.ts                  # Express server & WebSocket matchmaking room engine
-├── src/
-│   ├── 3d/                    # Three.js / React Three Fiber components
-│   │   ├── AnimatedPiece.tsx  # Parabolic move interpolation & piece rendering
-│   │   ├── Board3D.tsx        # 3D wooden/marble board mesh & coordinates
-│   │   ├── CameraController.tsx # OrbitControls & dynamic camera presets
-│   │   ├── ChessCanvas.tsx    # 3D WebGL Canvas container & identity tracking
-│   │   └── Lighting.tsx       # Studio ambient, directional, & spot lighting
-│   ├── components/
-│   │   ├── board/             # 2D fallback chessboard & evaluation bar
-│   │   ├── game/              # Move history, captured pieces, clock panels
-│   │   └── ui/                # Navigation, promotion modal, game-over modal
-│   ├── pages/
-│   │   ├── PlayView.tsx       # Pass & Play local two-player view
-│   │   ├── VsAiView.tsx       # Player vs Local AI with difficulty selection
-│   │   ├── OnlineView.tsx     # Real-time WebSocket room lobby & arena
-│   │   ├── LearnView.tsx      # Grandmaster opening library
-│   │   ├── PuzzlesView.tsx    # Interactive tactical puzzles
-│   │   └── ProfileView.tsx    # Elo rating & game history statistics
-│   ├── services/
-│   │   ├── aiEngine.ts        # Heuristic Minimax AI with Alpha-Beta pruning
-│   │   ├── multiplayer.ts     # Client WebSocket manager & room dispatcher
-│   │   ├── sound.ts           # Procedural Web Audio API sound synthesizer
-│   │   └── storage.ts         # LocalStorage persistence for user stats
-│   ├── store/
-│   │   └── gameStore.ts       # Global Zustand state orchestrator
-│   ├── types/
-│   │   └── chess.ts           # Shared TypeScript interfaces & types
-│   ├── App.tsx                # View router & application root
-│   └── main.tsx               # React DOM entry point
-└── package.json
-```
+ChessVerse 3D is engineered to render cleanly and responsively across the full spectrum of modern hardware:
+
+- **Mobile Phones** (320px – 430px width): Compact UI layout, collapsible floating toolbars, touch gestures, and optimized canvas aspect ratios.
+- **Tablets & Foldables** (600px – 1024px width): Adaptive split-panel board layout, larger touch targets, and balanced sidebar trays.
+- **Laptops & Desktops** (1280px – 1920px width): Full dual-column dashboard with side-by-side move history, captured pieces display, and full 3D viewport.
+- **4K & Ultrawide Monitors** (2560px – 5120px width): Constrained max-width containers, crisp typography, and high-fidelity rendering without stretching.
 
 ---
 
-## 🛡️ Zero Paid API Guarantee
+## 🔧 Troubleshooting
 
-This project is engineered with a strict **Zero External API** philosophy:
-- ❌ No OpenAI, Anthropic, or paid LLM tokens required.
-- ❌ No external Stockfish cloud servers or rate limits.
-- ❌ No third-party audio CDNs or hosted model assets.
-- ❌ No database or authentication subscriptions.
-- ✅ **100% Free Forever**: Fully functional upon deployment with zero runtime operating cost.
+### WebGL Disabled or Hardware Acceleration Off
+If your browser or device does not have WebGL enabled, ChessVerse 3D automatically falls back to an accessible, responsive 2D SVG board with full gameplay and tactical features intact. You can also manually switch between 3D and 2D mode in the Settings modal.
 
----
+### Performance on Low-End Hardware
+Navigate to **Settings** (gear icon) → **Graphics** and select **Low Quality**. This automatically:
+- Disables dynamic shadow mapping
+- Disables ambient dust particle simulations
+- Caps device pixel ratio to 1.0
+- Switches to low-power GPU profile
 
-## ⌨️ Controls & Gestures
-
-- **Left Mouse Click / Tap**: Select piece and target destination square.
-- **Drag & Drop**: Pick up and drop pieces directly on the 3D board.
-- **Left Click + Drag (Background)**: Orbit & rotate the 3D camera around the board.
-- **Right Click + Drag**: Pan the camera.
-- **Scroll Wheel / Pinch**: Zoom in and out.
-- **Perspective Button**: Toggle instantly between top-down 2D and immersive 3D views.
+### Audio Not Playing
+Modern browsers require a user interaction (such as a click or tap) before allowing Web Audio playback. Simply click any piece or button to initialize the audio context.
 
 ---
 
 ## 📄 License
 
-Distributed under the **MIT License**. See `LICENSE` for more information.
-
-<div align="center">
-  <sub>Built with ❤️ for chess lovers, grandmasters, and developers worldwide.</sub>
-</div>
+Distributed under the **MIT License**.

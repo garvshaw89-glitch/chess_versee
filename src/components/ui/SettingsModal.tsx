@@ -13,6 +13,7 @@ import { BoardThemeId, PieceThemeId } from '../../types/chess';
 import { Modal3D } from '../transitions/Modal3D';
 import { Button3D } from './Button3D';
 import { soundService } from '../../services/sound';
+import { useNavigationStore } from '../../store/navigationStore';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -23,6 +24,7 @@ type SettingsTab = 'graphics' | 'sound' | 'gameplay' | 'accessibility';
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
   const [activeTab, setActiveTab] = useState<SettingsTab>('gameplay');
+  const { openThemesModal } = useNavigationStore();
 
   const {
     graphics,
@@ -49,11 +51,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
   ];
 
   const pieceThemes: { id: PieceThemeId; label: string }[] = [
-    { id: 'classic', label: 'Classic Lacquer' },
-    { id: 'wood', label: 'Polished Wood' },
-    { id: 'marble', label: 'Sculpted Marble' },
+    { id: 'marble', label: 'Carrara Marble' },
+    { id: 'minimalist', label: 'Minimalist Bauhaus' },
+    { id: 'wood', label: 'Classic Wood' },
     { id: 'metal', label: 'Brushed Metal' },
-    { id: 'futuristic', label: 'Luminous Cyber' }
+    { id: 'futuristic', label: 'Luminous Cyber' },
+    { id: 'classic', label: 'Classic Lacquer' }
   ];
 
   return (
@@ -103,6 +106,33 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {activeTab === 'gameplay' && (
             <div className="space-y-5">
+              {/* Themes Studio Banner */}
+              <div className="p-3.5 rounded-xl bg-gradient-to-r from-amber-500/15 via-amber-500/10 to-transparent border border-amber-500/30 flex items-center justify-between gap-3 flex-wrap">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Palette className="w-4 h-4 text-amber-400" />
+                    <span className="text-xs font-bold text-neutral-100 font-brand">Interactive 3D Themes Studio</span>
+                    <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
+                      Real-time Preview
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-neutral-400 mt-0.5">
+                    Rotate, zoom, and inspect marble, minimalist, and wood sets under physical studio lighting.
+                  </p>
+                </div>
+                <Button3D
+                  variant="amber"
+                  size="sm"
+                  onClick={() => {
+                    onClose();
+                    openThemesModal();
+                  }}
+                  className="font-bold text-neutral-950 text-xs"
+                >
+                  <span>Open Studio →</span>
+                </Button3D>
+              </div>
+
               {/* Board Theme */}
               <div>
                 <label className="text-xs font-bold text-neutral-300 uppercase tracking-wider block mb-2">

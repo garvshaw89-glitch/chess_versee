@@ -54,8 +54,8 @@ export const INITIAL_GAMES: HistoricalGame[] = [
   {
     id: 'g_init_1',
     date: '2026-03-08',
-    opponent: 'Stockfish Neural (Medium)',
-    mode: 'vs_ai',
+    opponent: 'Grandmaster Magnus (Sim)',
+    mode: 'local_2p',
     result: 'win',
     reason: 'checkmate',
     playerColor: 'w',
@@ -68,8 +68,8 @@ export const INITIAL_GAMES: HistoricalGame[] = [
   {
     id: 'g_init_2',
     date: '2026-03-05',
-    opponent: 'Stockfish Master (1480)',
-    mode: 'vs_ai',
+    opponent: 'Challenger Alex',
+    mode: 'local_2p',
     result: 'win',
     reason: 'resignation',
     playerColor: 'b',
@@ -82,8 +82,8 @@ export const INITIAL_GAMES: HistoricalGame[] = [
   {
     id: 'g_init_3',
     date: '2026-02-28',
-    opponent: 'AI Engine Hard (1600)',
-    mode: 'vs_ai',
+    opponent: 'Tactician Sarah',
+    mode: 'local_2p',
     result: 'loss',
     reason: 'timeout',
     playerColor: 'w',

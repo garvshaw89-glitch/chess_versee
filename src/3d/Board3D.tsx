@@ -29,7 +29,7 @@ export function coordsToSquare(x: number, z: number): string {
   return `${file}${rank}`;
 }
 
-function getBoardColors(theme: BoardThemeId) {
+export function getBoardColors(theme: BoardThemeId) {
   switch (theme) {
     case 'midnight':
       return {

@@ -8,20 +8,18 @@ export interface ChessPieceData {
 }
 
 export type BoardThemeId = 'classic' | 'midnight' | 'royal' | 'marble' | 'wood' | 'cyber';
-export type PieceThemeId = 'classic' | 'wood' | 'marble' | 'metal' | 'futuristic';
+export type PieceThemeId = 'classic' | 'wood' | 'marble' | 'minimalist' | 'metal' | 'futuristic';
 
 export type CameraPreset = 'top' | 'isometric' | 'cinematic' | 'player_w' | 'player_b';
 
 export type GameMode = 
-  | 'vs_ai' 
+  | 'play' 
   | 'local_2p' 
   | 'custom' 
   | 'puzzle' 
   | 'practice'
   | 'learn'
   | 'analysis';
-
-export type AIDifficulty = 'beginner' | 'easy' | 'medium' | 'hard' | 'expert' | 1 | 2 | 3 | 4 | 5;
 
 export interface TimeControlPreset {
   id: string;
