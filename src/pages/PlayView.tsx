@@ -7,11 +7,24 @@ import { MoveHistoryBottomSheet } from '../components/ui/MoveHistoryBottomSheet'
 import { GameControlsBar } from '../components/ui/GameControlsBar';
 import { PromotionModal } from '../components/ui/PromotionModal';
 import { CheckmateModal } from '../components/ui/CheckmateModal';
+import { AIOpponentModal } from '../components/ui/AIOpponentModal';
 import { useGameStore } from '../store/gameStore';
 import { NavPage } from '../components/ui/Navbar';
-import { Shield, Sparkles, AlertCircle, Users, History, RotateCw } from 'lucide-react';
+import { 
+  Shield, 
+  Sparkles, 
+  AlertCircle, 
+  Users, 
+  History, 
+  RotateCw, 
+  Bot, 
+  Zap, 
+  Cpu 
+} from 'lucide-react';
 import { Button3D } from '../components/ui/Button3D';
 import { useDevice } from '../services/deviceTier';
+import { StorageService } from '../services/storage';
+import { EloService } from '../services/eloService';
 
 interface PlayViewProps {
   onNavigate: (page: NavPage) => void;
@@ -20,6 +33,7 @@ interface PlayViewProps {
 
 export const PlayView: React.FC<PlayViewProps> = ({ onNavigate, onOpenSettings }) => {
   const [historySheetOpen, setHistorySheetOpen] = useState(false);
+  const [aiModalOpen, setAiModalOpen] = useState(false);
   const device = useDevice();
   const {
     gameMode,
@@ -31,8 +45,14 @@ export const PlayView: React.FC<PlayViewProps> = ({ onNavigate, onOpenSettings }
     history,
     toggleOrientation,
     setTwoPlayerSetupOpen,
-    setGameMode
+    setGameMode,
+    aiOpponent,
+    isAiThinking
   } = useGameStore();
+
+  const userStats = StorageService.getStats();
+  const userRating = userStats.rating;
+  const stakes = EloService.getPotentialChanges(userRating, aiOpponent.rating);
 
   const currentTurnPlayer = turn === 'w' ? players.white : players.black;
   const isLandscapeMobile = device.isLandscape && (device.isMobile || device.height < 520);
@@ -47,42 +67,79 @@ export const PlayView: React.FC<PlayViewProps> = ({ onNavigate, onOpenSettings }
           
           {/* Top Status Strip */}
           <div className="w-full max-w-xl flex items-center justify-between z-10 px-2 py-1 gap-1.5 flex-wrap">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
-              <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-neutral-200 font-mono">
-                <span className="flex items-center gap-1.5">
-                  <span className="text-neutral-100">{players.white}</span>
-                  <span className="text-amber-500 font-bold text-xs">vs</span>
-                  <span className="text-neutral-300">{players.black}</span>
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+              
+              {/* Opponents & Elo Tags */}
+              <div className="flex items-center gap-1 font-mono text-[11px] sm:text-xs">
+                <span className="px-2 py-0.5 rounded bg-neutral-900 border border-neutral-800 text-neutral-100 font-bold">
+                  {players.white}
                 </span>
-              </span>
+                <span className="text-amber-500 font-bold text-xs">vs</span>
+                <span className="px-2 py-0.5 rounded bg-neutral-900 border border-neutral-800 text-neutral-300 font-bold">
+                  {players.black}
+                </span>
+              </div>
+
+              {/* Bot Selector Button */}
+              <Button3D
+                variant="secondary"
+                size="sm"
+                onClick={() => setAiModalOpen(true)}
+                icon={<Bot className="w-3 h-3 text-amber-400" />}
+                title="Change AI bot or difficulty"
+                className="!py-1 !px-2 text-[10px] sm:text-[11px]"
+              >
+                <span>{aiOpponent.name} ({aiOpponent.rating})</span>
+              </Button3D>
 
               {/* Quick Players / Clock Setup Button */}
               <Button3D
                 variant="secondary"
                 size="sm"
                 onClick={() => setTwoPlayerSetupOpen(true)}
-                icon={<Users className="w-3 h-3 text-amber-400" />}
+                icon={<Users className="w-3 h-3 text-sky-400" />}
                 title="Edit player names or time control"
-                className="!py-1 !px-2 text-[11px]"
+                className="!py-1 !px-2 text-[10px] sm:text-[11px]"
               >
-                <span>Players & Clock</span>
+                <span>Format</span>
               </Button3D>
             </div>
 
-            {/* Turn / Check Indicator Banner */}
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-neutral-900/80 border border-neutral-800 text-[11px] sm:text-xs font-semibold backdrop-blur-md">
-              {isCheck ? (
-                <span className="text-red-400 flex items-center gap-1.5 animate-bounce">
+            {/* Turn / AI Thinking Banner */}
+            <div className="flex items-center gap-1.5">
+              {isAiThinking ? (
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/20 border border-amber-500/50 text-[11px] sm:text-xs font-mono font-bold text-amber-300 animate-pulse backdrop-blur-md">
+                  <Cpu className="w-3.5 h-3.5 animate-spin" />
+                  <span>AI Thinking...</span>
+                </div>
+              ) : isCheck ? (
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-950/80 border border-red-500/60 text-[11px] sm:text-xs font-semibold text-red-300 backdrop-blur-md animate-bounce">
                   <AlertCircle className="w-3.5 h-3.5" /> CHECK! ({currentTurnPlayer})
-                </span>
+                </div>
               ) : (
-                <span className="text-neutral-200">
-                  <span className="font-bold text-amber-400">{currentTurnPlayer}</span>
-                  <span className="text-neutral-400 ml-1">({turn === 'w' ? 'White' : 'Black'})</span>
-                </span>
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-neutral-900/80 border border-neutral-800 text-[11px] sm:text-xs font-semibold backdrop-blur-md">
+                  <span className="text-neutral-200">
+                    <span className="font-bold text-amber-400">{currentTurnPlayer}</span>
+                    <span className="text-neutral-400 ml-1">({turn === 'w' ? 'White' : 'Black'})</span>
+                  </span>
+                </div>
               )}
             </div>
+          </div>
+
+          {/* Elo Stakes Sub-strip */}
+          <div className="w-full max-w-xl px-2 flex items-center justify-between text-[10px] font-mono text-neutral-400 z-10">
+            <span className="flex items-center gap-1">
+              <Zap className="w-3 h-3 text-amber-400" />
+              <span>Your Elo: <strong className="text-neutral-200">{userRating}</strong></span>
+            </span>
+            <span className="flex items-center gap-2">
+              <span>Potential:</span>
+              <span className="text-emerald-400 font-semibold">+{stakes.win}W</span>
+              <span className="text-neutral-300 font-semibold">{stakes.draw >= 0 ? `+${stakes.draw}` : stakes.draw}D</span>
+              <span className="text-rose-400 font-semibold">{stakes.loss}L</span>
+            </span>
           </div>
 
           {/* 3D Canvas Container */}
@@ -149,6 +206,10 @@ export const PlayView: React.FC<PlayViewProps> = ({ onNavigate, onOpenSettings }
       />
 
       {/* Overlays */}
+      <AIOpponentModal
+        isOpen={aiModalOpen}
+        onClose={() => setAiModalOpen(false)}
+      />
       <PromotionModal />
       <CheckmateModal onNavigateHome={() => onNavigate('landing')} />
     </div>

@@ -26,12 +26,14 @@ export const TwoPlayerSetupModal: React.FC<TwoPlayerSetupModalProps> = ({ onStar
     setTwoPlayerSetupOpen, 
     startTwoPlayerGame, 
     players, 
+    localOpponentRating,
     timeControl: initialTimeControl,
     autoFlipBoard: initialAutoFlip
   } = useGameStore();
 
   const [player1Name, setPlayer1Name] = useState('Player 1');
   const [player2Name, setPlayer2Name] = useState('Player 2');
+  const [player2Rating, setPlayer2Rating] = useState(localOpponentRating || 1200);
   // Which color player 1 selected: 'w' or 'b'
   const [player1Color, setPlayer1Color] = useState<PieceColor>('w');
   const [selectedTimeControl, setSelectedTimeControl] = useState<TimeControlPreset>(
@@ -48,11 +50,12 @@ export const TwoPlayerSetupModal: React.FC<TwoPlayerSetupModalProps> = ({ onStar
       if (players.black && players.black !== 'DeepAI') {
         setPlayer2Name(players.black);
       }
+      setPlayer2Rating(localOpponentRating || 1200);
       setPlayer1Color('w');
       setSelectedTimeControl(initialTimeControl || TIME_CONTROL_PRESETS[6]);
       setAutoFlip(initialAutoFlip);
     }
-  }, [isTwoPlayerSetupOpen]);
+  }, [isTwoPlayerSetupOpen, localOpponentRating]);
 
   if (!isTwoPlayerSetupOpen) return null;
 
@@ -80,6 +83,7 @@ export const TwoPlayerSetupModal: React.FC<TwoPlayerSetupModalProps> = ({ onStar
     startTwoPlayerGame({
       whiteName: finalWhite,
       blackName: finalBlack,
+      blackRating: player2Rating,
       timeControl: selectedTimeControl,
       autoFlipBoard: autoFlip
     });
@@ -226,6 +230,23 @@ export const TwoPlayerSetupModal: React.FC<TwoPlayerSetupModalProps> = ({ onStar
                 maxLength={24}
                 className="w-full px-3 py-2 rounded-lg bg-neutral-950/70 border border-neutral-700 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 text-neutral-100 text-sm font-medium outline-none transition-all placeholder:text-neutral-500"
               />
+
+              {/* Local Opponent Estimated Elo */}
+              <div className="flex items-center justify-between gap-2 mt-2 pt-2 border-t border-neutral-800/80">
+                <span className="text-[11px] font-mono text-neutral-400">Opponent Elo:</span>
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="number"
+                    min={400}
+                    max={2800}
+                    step={25}
+                    value={player2Rating}
+                    onChange={(e) => setPlayer2Rating(Number(e.target.value) || 1200)}
+                    className="w-20 px-2 py-0.5 rounded bg-neutral-950 border border-neutral-700 font-mono text-xs text-amber-400 font-bold text-center focus:border-amber-500 outline-none"
+                  />
+                  <span className="text-[10px] font-mono text-neutral-500">pts</span>
+                </div>
+              </div>
 
               {/* Color Chooser for Player 2 */}
               <div className="flex items-center gap-1.5 mt-2.5">

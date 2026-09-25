@@ -30,7 +30,9 @@ export interface TimeControlPreset {
 
 export interface PlayerStats {
   username: string;
-  rating: number;
+  rating: number; // Current Elo rating
+  peakRating: number;
+  lowestRating: number;
   gamesPlayed: number;
   wins: number;
   losses: number;
@@ -39,6 +41,45 @@ export interface PlayerStats {
   bestStreak: number;
   puzzleRating: number;
   puzzlesSolved: number;
+  aiGamesPlayed: number;
+  aiWins: number;
+  aiLosses: number;
+  aiDraws: number;
+  localGamesPlayed: number;
+  localWins: number;
+  localLosses: number;
+  localDraws: number;
+}
+
+export interface EloHistoryEntry {
+  id: string;
+  date: string;
+  timestamp: number;
+  opponent: string;
+  opponentRating: number;
+  opponentType: 'ai' | 'local';
+  result: 'win' | 'loss' | 'draw';
+  reason: string;
+  ratingBefore: number;
+  ratingAfter: number;
+  change: number; // e.g. +18, -12
+  expectedScore: number;
+  movesCount: number;
+  playerColor: PieceColor;
+}
+
+export interface EloAdjustmentRecord {
+  ratingBefore: number;
+  ratingAfter: number;
+  change: number;
+  result: 'win' | 'loss' | 'draw';
+  opponentName: string;
+  opponentRating: number;
+  opponentType: 'ai' | 'local';
+  expectedScore: number;
+  tierBefore: string;
+  tierAfter: string;
+  tierChanged: boolean;
 }
 
 export interface HistoricalGame {

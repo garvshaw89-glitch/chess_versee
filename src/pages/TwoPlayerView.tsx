@@ -18,10 +18,13 @@ import {
   Settings, 
   Sparkles,
   CheckCircle2,
-  RefreshCw
+  RefreshCw,
+  Zap
 } from 'lucide-react';
 import { Button3D } from '../components/ui/Button3D';
 import { useDevice } from '../services/deviceTier';
+import { StorageService } from '../services/storage';
+import { EloService } from '../services/eloService';
 
 interface TwoPlayerViewProps {
   onNavigate: (page: NavPage) => void;
@@ -45,8 +48,14 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({ onNavigate, onOpen
     setGameMode,
     resetGame,
     setCameraPreset,
-    showToast
+    showToast,
+    localOpponentRating
   } = useGameStore();
+
+  const userStats = StorageService.getStats();
+  const userRating = userStats.rating;
+  const oppRating = localOpponentRating || 1200;
+  const stakes = EloService.getPotentialChanges(userRating, oppRating);
 
   // On mount, ensure game mode is local 2-player and set camera perspective
   useEffect(() => {
@@ -115,6 +124,19 @@ export const TwoPlayerView: React.FC<TwoPlayerViewProps> = ({ onNavigate, onOpen
                 </span>
               )}
             </div>
+          </div>
+
+          {/* Local Elo Stakes Sub-strip */}
+          <div className="w-full max-w-xl px-2 flex items-center justify-between text-[10px] font-mono text-neutral-400 z-10">
+            <span className="flex items-center gap-1">
+              <Zap className="w-3 h-3 text-sky-400" />
+              <span>Rated Match • You ({userRating}) vs Opponent ({oppRating})</span>
+            </span>
+            <span className="flex items-center gap-2">
+              <span className="text-emerald-400 font-semibold">+{stakes.win}W</span>
+              <span className="text-neutral-300 font-semibold">{stakes.draw >= 0 ? `+${stakes.draw}` : stakes.draw}D</span>
+              <span className="text-rose-400 font-semibold">{stakes.loss}L</span>
+            </span>
           </div>
 
           {/* 3D Interactive Canvas */}
