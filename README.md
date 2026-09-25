@@ -1,7 +1,7 @@
 <div align="center">
 
-# ⚡ CHESSVERSE 3D
-### *Next-Generation 3D WebGL Chess Universe, Interactive Academy & Local Arena*
+# ⚡ CHESSVERSE
+### *Next-Generation WebGL Chess Universe, Interactive Academy & Local Arena*
 
 [![WebGL](https://img.shields.io/badge/WebGL-Three.js_r183-000000?style=for-the-badge&logo=three.js&logoColor=white)](https://threejs.org/)
 [![React](https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
@@ -12,19 +12,19 @@
 
 <br/>
 
-<!-- HERO ANIMATED 3D BANNER -->
+<!-- HERO ANIMATED BANNER -->
 <p align="center">
-  <img src="assets/banner.svg" alt="ChessVerse 3D Animated Hero Banner" width="100%" />
+  <img src="assets/banner.svg" alt="ChessVerse Animated Hero Banner" width="100%" />
 </p>
 
 <p align="center">
-  <b>Cinematic 3D WebGL Chessboard • Parabolic Flight Physics • Interactive 3D Academy • Local Pass & Play • 100% Free & Self-Contained</b>
+  <b>Cinematic WebGL Chessboard • Parabolic Flight Physics • Interactive Chess Academy • Local Pass & Play • 100% Free & Self-Contained</b>
 </p>
 
 <p align="center">
   <a href="#-animated-modes-console">🕹️ Core Modes</a> •
-  <a href="#-3d-physics--kinematics-engine">🚀 Flight Kinematics</a> •
-  <a href="#-procedural-3d-mesh-gallery">🎲 3D Mesh Gallery</a> •
+  <a href="#-flight-kinematics-engine">🚀 Flight Kinematics</a> •
+  <a href="#-mesh-gallery">🎲 Mesh Gallery</a> •
   <a href="#-system-architecture">🏛️ Architecture</a> •
   <a href="#-quick-start">⚡ Quick Start</a> •
   <a href="#-camera-controls--shortcuts">🎥 Camera &amp; Controls</a> •
@@ -37,13 +37,13 @@
 
 ## 🌟 Highlights & Capabilities
 
-- 🎲 **Cinematic 3D Scene Graph**: Rendered via **Three.js** and **React Three Fiber** featuring procedural faceted pieces, dynamic point lights, soft `PCFShadowMap` shadowing, subtle atmospheric particles, and real-time board reflections.
+- 🎲 **Cinematic Scene Graph**: Rendered via **Three.js** and **React Three Fiber** featuring procedural faceted pieces, dynamic point lights, soft `PCFShadowMap` shadowing, subtle atmospheric particles, and real-time board reflections.
 - 🚀 **Parabolic Jump Kinematics**: Realistic flight arcs with vertical lift, directional tilt along the move vector, altitude-scaled ground shadows, and damped landing impacts.
 - 🎥 **Smooth Orbital Camera Controller**: Smooth camera interpolations, free 360° orbital rotation, pan & zoom, and 4 one-click perspective presets (White, Black, 2D Tactical Top-Down, and Cinematic Orbit).
 - 👥 **Dedicated 2-Player Pass & Play Arena**: Side-by-side battle station with configurable dual Fischer chess clocks (Bullet, Blitz, Rapid, Classical, Custom), turn-based 180° auto board flipping, live material count differentials, and captured piece graveyards.
-- 🎓 **Interactive 3D Chess Academy**: Multi-chapter curriculum covering Fundamentals, Tactics, Openings, and Endgames with 3D board focus rings, animated move guide arrows, step explanations, and interactive validation.
+- 🎓 **Interactive Chess Academy**: Multi-chapter curriculum covering Fundamentals, Tactics, Openings, and Endgames with board focus rings, animated move guide arrows, step explanations, and interactive validation.
 - 🧩 **Rating-Tiered Tactical Puzzles**: Curated tactical puzzle library (Pins, Forks, Skewers, Discovered Attacks, Mate-in-2) with step verification, mistake detection, hint visualization, and solve streaks.
-- 🎨 **Board & Piece Material Studio**: Live interactive 3D studio previewing 5 board themes (*Midnight Onyx, Royal Walnut, Cyber Grid, Classic Tournament, Emerald Forest*) and 4 piece materials (*Alabaster, Obsidian, Gold Leaf, Brushed Metal*).
+- 🎨 **Board & Piece Material Studio**: Live interactive studio previewing 5 board themes (*Midnight Onyx, Royal Walnut, Cyber Grid, Classic Tournament, Emerald Forest*) and 4 piece materials (*Alabaster, Obsidian, Gold Leaf, Brushed Metal*).
 - 🎵 **Procedural Web Audio Engine**: 100% synthesized soundscape using the Web Audio API—zero MP3/WAV assets to load. Dynamic sound effects for slides, captures, checks, promotions, clock ticks, and checkmate.
 - ⚡ **Adaptive Hardware Benchmarking**: Automated GPU tier detection dynamically configures shadow mapping, particle counts, and device pixel ratio (DPR) to guarantee 60 FPS on any device.
 
@@ -53,28 +53,28 @@
 
 <!-- ANIMATED MODES CARDS GRAPHIC -->
 <p align="center">
-  <img src="assets/modes-showcase-3d.svg" alt="ChessVerse 3D Core Game Modes" width="100%" />
+  <img src="assets/modes-showcase-3d.svg" alt="ChessVerse Core Game Modes" width="100%" />
 </p>
 
 | Mode | Target Experience | Key Engine Capabilities |
 | :--- | :--- | :--- |
 | **⚔️ PLAY ARENA** | Solo Sandbox &amp; Engine Practice | Real-time FIDE legality validation, pawn promotion modal, interactive move rewind slider, and FEN/PGN clipboard export. |
 | **👥 2 PLAYER** | Local Over-the-Board Play | Dedicated dual-seat layout, customizable Fischer chess clocks with increments, auto-flipping board orientation, and full move history. |
-| **🎓 LEARN ACADEMY** | Guided 3D Masterclasses | Step-by-step interactive lessons with 3D board target rings, animated trajectory vectors, contextual hints, and persistent study streaks. |
+| **🎓 LEARN ACADEMY** | Guided Masterclasses | Step-by-step interactive lessons with board target rings, animated trajectory vectors, contextual hints, and persistent study streaks. |
 | **🧩 TACTICAL PUZZLES** | Pattern Recognition Drill | Curated rating tiers from 800 to 2200 ELO with step validation, mistake counters, visual hint overlays, and tactical categories. |
 | **👤 PLAYER PROFILE** | Verifiable Local Career Record | Persistent tracking of Games Played, Wins, Losses, Draws, Lessons Completed, Puzzles Solved, Win Streaks, and Course Progress. |
-| **🎨 THEMES STUDIO** | Visual Customization Sandbox | Live rotating 3D preview of board woodgrains, carbon-fiber inlays, metallic shaders, and ambient neon edge lighting. |
+| **🎨 THEMES STUDIO** | Visual Customization Sandbox | Live rotating preview of board woodgrains, carbon-fiber inlays, metallic shaders, and ambient neon edge lighting. |
 
 ---
 
-## 🚀 3D Physics &amp; Kinematics Engine
+## 🚀 Flight Kinematics Engine
 
-<!-- ANIMATED 3D PHYSICS TRAJECTORY GRAPHIC -->
+<!-- ANIMATED PHYSICS TRAJECTORY GRAPHIC -->
 <p align="center">
-  <img src="assets/physics-trajectory-3d.svg" alt="3D Parabolic Arc Trajectory &amp; Dynamic Tilt Physics" width="100%" />
+  <img src="assets/physics-trajectory-3d.svg" alt="Parabolic Arc Trajectory &amp; Dynamic Tilt Physics" width="100%" />
 </p>
 
-ChessVerse 3D abandons flat, sliding piece movements in favor of a true **3D kinematic flight simulation**:
+ChessVerse abandons flat, sliding piece movements in favor of a true **kinematic flight simulation**:
 
 ### 1. Parabolic Flight Curve
 When a piece moves between square coordinates $(x_0, z_0)$ and $(x_1, z_1)$, its altitude $y(t)$ follows a smooth sinusoidal parabolic trajectory:
@@ -152,7 +152,7 @@ All 3D chess pieces are procedurally modeled using optimized Three.js geometries
 
 ## 🎥 Camera Controls &amp; Shortcuts
 
-ChessVerse 3D includes a responsive OrbitController with intelligent keyboard shortcuts:
+ChessVerse includes a responsive OrbitController with intelligent keyboard shortcuts:
 
 | Key / Gesture | Action | Description |
 | :---: | :--- | :--- |
@@ -202,8 +202,8 @@ Full Shaders    Basic Shaders     Low Power GPU
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/your-username/chessverse-3d.git
-cd chessverse-3d
+git clone https://github.com/your-username/chessverse.git
+cd chessverse
 ```
 
 ### 2. Install dependencies
@@ -228,30 +228,30 @@ npm run preview
 ## 📁 Repository Structure
 
 ```
-chessverse-3d/
-├── assets/                       # Animated 3D SVG Graphics for GitHub README
-│   ├── banner.svg                # Animated 3D Hero Banner
-│   ├── modes-showcase-3d.svg     # Animated 3D Core Game Modes Console
+chessverse/
+├── assets/                       # Animated SVG Graphics for GitHub README
+│   ├── banner.svg                # Animated Hero Banner
+│   ├── modes-showcase-3d.svg     # Animated Core Game Modes Console
 │   ├── physics-trajectory-3d.svg # Animated Parabolic Trajectory Diagram
-│   ├── pieces-showcase-3d.svg    # Animated 3D Procedural Mesh Gallery
+│   ├── pieces-showcase-3d.svg    # Animated Procedural Mesh Gallery
 │   └── architecture-3d.svg       # Animated 4-Layer Engine Architecture
 ├── public/                       # Static public assets & PWA manifest
 ├── src/
 │   ├── 3d/                       # Three.js & React Three Fiber components
-│   │   ├── ChessCanvas.tsx       # Primary 3D WebGL Canvas with OrbitControls
+│   │   ├── ChessCanvas.tsx       # Primary WebGL Canvas with OrbitControls
 │   │   ├── AnimatedPiece.tsx     # Parabolic flight kinematics & piece mesh
 │   │   ├── Board3D.tsx           # PBR board shaders, coordinate laser lines
 │   │   ├── CameraController.tsx  # Smooth camera transition interpolations
 │   │   ├── ParticleField.tsx     # Ambient atmospheric dust simulation
-│   │   └── ThemePreview3D.tsx    # Live rotating 3D theme studio stage
+│   │   └── ThemePreview3D.tsx    # Live rotating theme studio stage
 │   ├── components/               # React UI & HUD component suite
 │   │   ├── ui/Navbar.tsx         # Unified 6-destination responsive navigation
-│   │   ├── landing/HeroSection.tsx # 3D Landing command console
-│   │   └── ui/Button3D.tsx       # Physics-pressed 3D tactile buttons
+│   │   ├── landing/HeroSection.tsx # Landing command console
+│   │   └── ui/Button3D.tsx       # Physics-pressed tactile buttons
 │   ├── pages/                    # Core view modules
-│   │   ├── PlayView.tsx          # 3D Solo / Practice Sandbox
+│   │   ├── PlayView.tsx          # Solo / Practice Sandbox
 │   │   ├── TwoPlayerView.tsx     # Local Pass & Play dual-clock arena
-│   │   ├── LearnView.tsx         # Interactive 3D Academy
+│   │   ├── LearnView.tsx         # Interactive Chess Academy
 │   │   ├── PuzzlesView.tsx       # Tactical Puzzle Drills
 │   │   └── ProfileView.tsx       # Verifiable Career Record
 │   ├── services/
