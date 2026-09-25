@@ -179,7 +179,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
                   </div>
                 )}
                 <p className="text-xs text-neutral-400 mt-1">
-                  ChessVerse 3D Practitioner • Verified FIDE Elo Rating System
+                  ChessVerse Practitioner • Verified FIDE Elo Rating System
                 </p>
               </div>
 

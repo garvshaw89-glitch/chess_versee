@@ -25,7 +25,7 @@ import confetti from 'canvas-confetti';
 
 const STEP_LABELS: { type: LearnStepType; label: string; number: number }[] = [
   { type: 'concept', label: 'Concept', number: 1 },
-  { type: 'demonstration', label: '3D Demo', number: 2 },
+  { type: 'demonstration', label: 'Demonstration', number: 2 },
   { type: 'try', label: 'Try It', number: 3 },
   { type: 'solve', label: 'Solve', number: 4 },
   { type: 'quiz', label: 'Quiz', number: 5 },
@@ -158,7 +158,7 @@ export const LessonPlayer: React.FC = () => {
               onChange={(e) => setCameraMode(e.target.value as LearnCameraMode)}
               className="bg-transparent text-[11px] sm:text-xs font-medium text-neutral-200 outline-none cursor-pointer pr-1"
             >
-              <option value="tactical" className="bg-neutral-900 text-white">Tactical 3D</option>
+              <option value="tactical" className="bg-neutral-900 text-white">Tactical View</option>
               <option value="overview" className="bg-neutral-900 text-white">Overview</option>
               <option value="focus" className="bg-neutral-900 text-white">Focus Zoom</option>
               <option value="top" className="bg-neutral-900 text-white">Top 2D View</option>
@@ -201,7 +201,7 @@ export const LessonPlayer: React.FC = () => {
           {(currentStep === 'try' || currentStep === 'solve') && (
             <div className="absolute bottom-3 sm:bottom-4 z-10 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-neutral-900/90 border border-amber-500/40 text-[11px] sm:text-xs font-bold text-amber-300 backdrop-blur-md shadow-xl flex items-center gap-2 animate-pulse">
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span>{currentStep === 'try' ? 'Free Practice: Move pieces on the 3D board' : 'Challenge: Make your move on the board!'}</span>
+              <span>{currentStep === 'try' ? 'Free Practice: Move pieces on the board' : 'Challenge: Make your move on the board!'}</span>
             </div>
           )}
         </div>
@@ -257,12 +257,12 @@ export const LessonPlayer: React.FC = () => {
               </div>
             )}
 
-            {/* STEP 2: 3D DEMONSTRATION */}
+            {/* STEP 2: DEMONSTRATION */}
             {currentStep === 'demonstration' && (
               <div className="flex flex-col gap-4">
                 <h3 className="text-xl font-extrabold text-white flex items-center gap-2">
                   <Eye className="w-5 h-5 text-amber-400" />
-                  3D Spatial Demonstration
+                  Interactive Demonstration
                 </h3>
                 <p className="text-sm text-neutral-300 leading-relaxed">
                   {lesson.demonstration.narration}
@@ -270,10 +270,10 @@ export const LessonPlayer: React.FC = () => {
 
                 <div className="bg-neutral-900/80 border border-neutral-800 rounded-xl p-4 flex flex-col gap-2">
                   <span className="text-xs font-bold text-neutral-400 font-mono uppercase">
-                    3D Board Visualization
+                    Board Visualization
                   </span>
                   <p className="text-xs text-neutral-300 leading-relaxed">
-                    Observe the active highlighted squares and tactical indicators on the board. You can freely rotate and orbit the 3D board using click-and-drag.
+                    Observe the active highlighted squares and tactical indicators on the board. You can freely rotate and orbit the board using click-and-drag.
                   </p>
                 </div>
               </div>
@@ -295,7 +295,7 @@ export const LessonPlayer: React.FC = () => {
                     Hands-On Practice
                   </span>
                   <p className="text-xs text-neutral-300 leading-relaxed">
-                    Click any friendly piece on the 3D board to reveal its available destination squares. Move pieces around to feel their reach!
+                    Click any friendly piece on the board to reveal its available destination squares. Move pieces around to feel their reach!
                   </p>
                 </div>
 

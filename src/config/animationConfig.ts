@@ -1,6 +1,6 @@
 /**
- * Centralized Animation Configuration for ChessVerse 3D
- * All durations, easings, 3D perspective values, and sound triggers
+ * Centralized Animation Configuration for ChessVerse
+ * All durations, easings, perspective values, and sound triggers
  */
 
 export const ANIMATION_CONFIG = {

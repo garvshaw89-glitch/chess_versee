@@ -52,12 +52,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
         {/* Eyebrow badge */}
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-neutral-900/80 border border-amber-500/30 text-amber-300 text-xs font-mono font-medium backdrop-blur-md shadow-lg shadow-amber-500/5 mb-4">
           <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-          <span>NEXT-GENERATION 3D CHESS BATTLEFIELD</span>
+          <span>NEXT-GENERATION CHESS BATTLEFIELD</span>
         </div>
 
         {/* Hero Title */}
         <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-neutral-100 font-display max-w-3xl leading-[1.08] drop-shadow-2xl">
-          CHESSVERSE <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-500">3D</span>
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-neutral-100 via-amber-200 to-amber-400">CHESSVERSE</span>
         </h1>
 
         {/* Subtitle */}
@@ -130,7 +130,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
               <GraduationCap className="w-4 h-4" />
             </div>
             <div>
-              <h4 className="text-xs font-bold text-neutral-200 uppercase">3D Academy</h4>
+              <h4 className="text-xs font-bold text-neutral-200 uppercase">Chess Academy</h4>
               <p className="text-[11px] text-neutral-400 mt-0.5">Interactive lessons, practice drills & tactics</p>
             </div>
           </div>
@@ -160,7 +160,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
               <Sparkles className="w-4 h-4" />
             </div>
             <div>
-              <h4 className="text-xs font-bold text-neutral-200 uppercase">Procedural 3D Audio</h4>
+              <h4 className="text-xs font-bold text-neutral-200 uppercase">Procedural Spatial Audio</h4>
               <p className="text-[11px] text-neutral-400 mt-0.5">Tactile synthesized impact thuds & fanfares</p>
             </div>
           </div>

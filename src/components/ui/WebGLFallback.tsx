@@ -66,7 +66,7 @@ export const WebGLFallback: React.FC = () => {
             onClick={toggleViewMode}
             className="text-amber-400 hover:text-amber-300 transition-colors font-sans font-medium text-xs underline cursor-pointer"
           >
-            Switch to 3D View
+            Switch to Perspective View
           </button>
         </div>
 

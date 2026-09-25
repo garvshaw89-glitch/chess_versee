@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "Chess Verse 3D",
+  "name": "Chess Verse",
   "short_name": "ChessVerse",
-  "description": "Master the board. Control the game. Immersive cinematic 3D chess platform featuring realistic physics, interactive 3D learning academy, tactical puzzles, and local pass & play.",
+  "description": "Master the board. Control the game. Immersive cinematic chess platform featuring realistic physics, interactive learning academy, tactical puzzles, and local pass & play.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

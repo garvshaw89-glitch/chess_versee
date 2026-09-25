@@ -64,7 +64,7 @@ export const AI_OPPONENTS: AIOpponent[] = [
   },
   {
     id: 'ai_grandmaster',
-    name: 'Titan Alpha 3D',
+    name: 'Titan Alpha',
     title: 'Super Grandmaster',
     rating: 2150,
     avatar: '👑',

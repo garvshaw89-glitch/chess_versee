@@ -254,11 +254,11 @@ export const BoardThemesModal: React.FC<BoardThemesModalProps> = ({ isOpen, onCl
                   Board & Piece Themes Studio
                 </h2>
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
-                  Real-time 3D
+                  Real-time Preview
                 </span>
               </div>
               <p className="text-xs text-neutral-400 font-sans hidden sm:block">
-                Select high-fidelity materials, wood grains, and sculpted piece styles with instant 3D inspection.
+                Select high-fidelity materials, wood grains, and sculpted piece styles with instant live inspection.
               </p>
             </div>
           </div>
@@ -381,7 +381,7 @@ export const BoardThemesModal: React.FC<BoardThemesModalProps> = ({ isOpen, onCl
                 <div className="space-y-2.5">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-[11px] font-mono uppercase tracking-wider text-neutral-400">
-                      Select 3D Piece Architecture & Materials
+                      Select Piece Architecture & Materials
                     </span>
                     <span className="text-xs text-amber-400 font-semibold">
                       Current: {PIECE_THEMES.find(p => p.id === currentPieceTheme)?.name}
@@ -436,7 +436,7 @@ export const BoardThemesModal: React.FC<BoardThemesModalProps> = ({ isOpen, onCl
                               </div>
                             ) : (
                               <span className="text-[10px] text-neutral-400 group-hover:text-neutral-200 transition-colors">
-                                Preview in 3D →
+                                Preview Live →
                               </span>
                             )}
                           </div>

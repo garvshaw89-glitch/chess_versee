@@ -126,15 +126,15 @@ export const GameControlsBar: React.FC<GameControlsBarProps> = ({ onOpenSettings
           </div>
         )}
 
-        {/* 2D / 3D Switch */}
+        {/* View Mode Switch */}
         <Button3D
           variant="secondary"
           size="sm"
           onClick={toggleViewMode}
-          title={`Switch to ${graphics.viewMode === '3d' ? '2D Tactical' : '3D Immersive'} view`}
+          title={`Switch to ${graphics.viewMode === '3d' ? '2D Tactical' : 'Perspective'} view`}
           icon={<Layers className="w-3.5 h-3.5 text-cyan-400" />}
         >
-          <span className="font-mono text-[11px] font-bold">{graphics.viewMode.toUpperCase()}</span>
+          <span className="font-mono text-[11px] font-bold">{graphics.viewMode === '3d' ? 'PERSPECTIVE' : '2D'}</span>
         </Button3D>
 
         {/* Board & Piece Themes Button */}
@@ -142,7 +142,7 @@ export const GameControlsBar: React.FC<GameControlsBarProps> = ({ onOpenSettings
           variant="secondary"
           size="sm"
           onClick={openThemesModal}
-          title="Customize Board & 3D Piece Themes"
+          title="Customize Board & Piece Themes"
           icon={<Palette className="w-3.5 h-3.5 text-amber-400" />}
         >
           <span className="hidden sm:inline">Themes</span>

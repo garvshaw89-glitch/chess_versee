@@ -66,7 +66,7 @@ export const LearningDashboard: React.FC = () => {
             <div className="flex items-center gap-2">
               <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1.5">
                 <GraduationCap className="w-3.5 h-3.5" />
-                Chess Academy 3D
+                Chess Academy
               </span>
               <span className="text-xs text-neutral-400 font-mono">
                 {completedLessonIds.length} / {ALL_LESSONS.length} Lessons Finished

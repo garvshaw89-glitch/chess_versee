@@ -1,5 +1,5 @@
 /**
- * Web Audio API Sound Synthesizer for Chessverse 3D
+ * Web Audio API Sound Synthesizer for Chessverse
  * Generates all audio procedurally without external audio file dependencies.
  * Respects browser autoplay policies and volume controls.
  */

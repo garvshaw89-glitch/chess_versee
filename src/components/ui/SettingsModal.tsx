@@ -79,7 +79,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         <div className="flex border-b border-neutral-800 bg-neutral-950/30 px-6 gap-1 overflow-x-auto">
           {[
             { id: 'gameplay' as const, label: 'Gameplay & Themes', icon: Gamepad2 },
-            { id: 'graphics' as const, label: 'Graphics & 3D', icon: Monitor },
+            { id: 'graphics' as const, label: 'Graphics & Visuals', icon: Monitor },
             { id: 'sound' as const, label: 'Audio', icon: Volume2 },
             { id: 'accessibility' as const, label: 'Accessibility', icon: Eye }
           ].map((tab) => {
@@ -111,7 +111,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                 <div>
                   <div className="flex items-center gap-2">
                     <Palette className="w-4 h-4 text-amber-400" />
-                    <span className="text-xs font-bold text-neutral-100 font-brand">Interactive 3D Themes Studio</span>
+                    <span className="text-xs font-bold text-neutral-100 font-brand">Interactive Themes Studio</span>
                     <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
                       Real-time Preview
                     </span>
@@ -279,13 +279,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                 <div className="flex items-center justify-between py-2.5">
                   <div>
                     <span className="text-xs font-medium text-neutral-200 block">View Mode</span>
-                    <span className="text-[11px] text-neutral-400">Toggle between 3D Perspective and 2D Tactical</span>
+                    <span className="text-[11px] text-neutral-400">Toggle between Perspective and 2D Tactical</span>
                   </div>
                   <button
                     onClick={() => updateGraphics({ viewMode: graphics.viewMode === '3d' ? '2d' : '3d' })}
                     className="px-3 py-1 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-xs font-mono font-bold text-neutral-200 rounded-lg cursor-pointer"
                   >
-                    {graphics.viewMode.toUpperCase()}
+                    {graphics.viewMode === '3d' ? 'PERSPECTIVE' : '2D'}
                   </button>
                 </div>
               </div>

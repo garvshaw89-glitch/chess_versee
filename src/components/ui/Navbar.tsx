@@ -81,9 +81,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span className="font-brand text-base sm:text-lg font-bold tracking-wider text-neutral-100">
                   CHESS VERSE
                 </span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
-                  3D
-                </span>
               </div>
               <span className="text-[9px] font-mono uppercase tracking-widest text-neutral-400 hidden sm:block">
                 Master the board

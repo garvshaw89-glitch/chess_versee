@@ -90,7 +90,7 @@ export const TransitionOverlay: React.FC = () => {
 
         {/* Tactical Transition Title */}
         <div className="text-xs font-mono font-bold tracking-[0.25em] uppercase text-neutral-400 mt-2">
-          {theme?.tagline || 'CHESSVERSE 3D'}
+          {theme?.tagline || 'CHESSVERSE'}
         </div>
 
         <div className="text-base font-display font-extrabold text-neutral-100 tracking-wide mt-1">

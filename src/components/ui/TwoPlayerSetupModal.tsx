@@ -358,7 +358,7 @@ export const TwoPlayerSetupModal: React.FC<TwoPlayerSetupModalProps> = ({ onStar
               <div>
                 <div className="font-semibold text-neutral-200">Auto-rotate board on each move</div>
                 <div className="text-[11px] text-neutral-400">
-                  Flips the 3D board to match the active player's perspective
+                  Flips the board to match the active player's perspective
                 </div>
               </div>
             </div>
