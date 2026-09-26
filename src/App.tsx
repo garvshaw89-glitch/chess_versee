@@ -36,7 +36,7 @@ export default function App() {
   } = useNavigationStore();
 
   return (
-    <div className="min-h-screen bg-[#07090D] text-neutral-100 flex flex-col font-sans select-none overflow-x-hidden">
+    <div className="min-h-screen bg-[#05070A] text-neutral-100 flex flex-col font-sans select-none overflow-x-hidden">
       {/* Agency Custom Cursor (Desktop only, auto-hides on touch) */}
       <CustomCursor />
 

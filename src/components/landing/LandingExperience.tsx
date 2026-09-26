@@ -73,7 +73,7 @@ export const LandingExperience: React.FC<LandingExperienceProps> = ({ onNavigate
   };
 
   return (
-    <div className="relative w-full min-h-screen bg-[#08080a] text-neutral-100 flex flex-col overflow-x-hidden">
+    <div className="relative w-full min-h-screen bg-[#05070A] text-neutral-100 flex flex-col overflow-x-hidden">
       {/* ============================================================== */}
       {/* 01. CINEMATIC HERO SECTION                                    */}
       {/* ============================================================== */}

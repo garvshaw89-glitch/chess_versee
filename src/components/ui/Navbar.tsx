@@ -68,7 +68,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <>
       {/* Top Bar: Strict One-Row Three-Zone Contract */}
-      <header className="sticky top-0 z-40 w-full bg-[#08080a]/90 border-b border-white/5 backdrop-blur-xl px-4 sm:px-8 py-3 flex items-center justify-between transition-colors">
+      <header className="sticky top-0 z-40 w-full bg-[#05070A]/90 border-b border-white/5 backdrop-blur-xl px-4 sm:px-8 py-3 flex items-center justify-between transition-colors">
         {/* Zone 1: Single Text Element Brand Wordmark with Sovereign Symbol */}
         <div className="flex items-center gap-3">
           {currentPage !== 'landing' && (

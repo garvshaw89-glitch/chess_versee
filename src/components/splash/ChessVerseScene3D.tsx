@@ -2,177 +2,200 @@ import React, { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
+export type IntroStage =
+  | 'INTRO_VOID'
+  | 'INTRO_BOARD'
+  | 'INTRO_PIECES'
+  | 'INTRO_KING'
+  | 'INTRO_MOVE'
+  | 'INTRO_UNIVERSE'
+  | 'INTRO_IDENTITY'
+  | 'APP_TRANSITION';
+
 interface ChessVerseScene3DProps {
-  progress: number; // 0.0 to 1.0 (corresponds to 0s to 12s)
-  qualityTier?: 'high' | 'medium' | 'low';
+  progress: number; // Continuous 0.0 to 1.0 (corresponds to 0s to 14.5s)
+  isTransitioningToApp?: boolean;
 }
 
 // -------------------------------------------------------------
-// Materials Factory (Memoized for optimal WebGL performance)
+// Shared Smooth Interpolation Easing Utilities
 // -------------------------------------------------------------
-const usePieceMaterials = (opacity: number) => {
+// Smooth hermite smoothstep
+const smoothstep = (min: number, max: number, value: number) => {
+  const x = Math.max(0, Math.min(1, (value - min) / (max - min)));
+  return x * x * (3 - 2 * x);
+};
+
+// -------------------------------------------------------------
+// Materials Factory
+// Palette: #05070A (void), #0B1017 (chassis), #D6AF36 (gold), #F0D477 (bright gold), #4D7CFE (blue), #5DD6E6 (cyan)
+// -------------------------------------------------------------
+const useSharedMaterials = (opacity: number) => {
   return useMemo(() => {
     const clampedOpacity = Math.max(0, Math.min(1, opacity));
-    const darkMetal = new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#151A21'),
-      metalness: 0.85,
-      roughness: 0.22,
+    const darkObsidian = new THREE.MeshStandardMaterial({
+      color: new THREE.Color('#0D131C'),
+      metalness: 0.88,
+      roughness: 0.2,
       transparent: true,
       opacity: clampedOpacity,
     });
 
     const warmIvory = new THREE.MeshStandardMaterial({
       color: new THREE.Color('#F2EFE7'),
-      metalness: 0.12,
-      roughness: 0.35,
+      metalness: 0.1,
+      roughness: 0.32,
       transparent: true,
       opacity: clampedOpacity,
     });
 
-    const goldAccent = new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#E8C75A'),
-      emissive: new THREE.Color('#C9A227'),
-      emissiveIntensity: 0.35,
+    const sovereignGold = new THREE.MeshStandardMaterial({
+      color: new THREE.Color('#F0D477'),
+      emissive: new THREE.Color('#D6AF36'),
+      emissiveIntensity: 0.4,
       metalness: 0.95,
       roughness: 0.15,
       transparent: true,
       opacity: clampedOpacity,
     });
 
-    return { darkMetal, warmIvory, goldAccent };
+    return { darkObsidian, warmIvory, sovereignGold };
   }, [opacity]);
 };
 
 // -------------------------------------------------------------
-// King 3D Procedural Mesh
+// Procedural Chess Pieces (King, Queen, Rook, Bishop, Knight, Pawn)
 // -------------------------------------------------------------
-const KingMesh: React.FC<{ opacity: number; scale: number; position: [number, number, number] }> = ({
-  opacity,
-  scale,
-  position,
-}) => {
-  const { darkMetal, goldAccent } = usePieceMaterials(opacity);
+const KingMesh: React.FC<{
+  opacity: number;
+  scale: number;
+  position: [number, number, number];
+  isHeroHighlight?: boolean;
+}> = ({ opacity, scale, position, isHeroHighlight = false }) => {
+  const { darkObsidian, sovereignGold } = useSharedMaterials(opacity);
+
+  const heroGold = useMemo(() => {
+    return new THREE.MeshStandardMaterial({
+      color: new THREE.Color('#FFF1BE'),
+      emissive: new THREE.Color('#D6AF36'),
+      emissiveIntensity: isHeroHighlight ? 0.65 : 0.35,
+      metalness: 0.95,
+      roughness: 0.12,
+      transparent: true,
+      opacity: Math.max(0, Math.min(1, opacity)),
+    });
+  }, [opacity, isHeroHighlight]);
+
+  const goldMat = isHeroHighlight ? heroGold : sovereignGold;
 
   return (
     <group position={position} scale={[scale, scale, scale]}>
       {/* Base Plinth */}
-      <mesh position={[0, 0.12, 0]} material={darkMetal} castShadow receiveShadow>
-        <cylinderGeometry args={[0.44, 0.5, 0.24, 28]} />
+      <mesh position={[0, 0.12, 0]} material={darkObsidian} castShadow receiveShadow>
+        <cylinderGeometry args={[0.45, 0.52, 0.24, 32]} />
       </mesh>
       {/* Gold Trim Ring */}
-      <mesh position={[0, 0.25, 0]} material={goldAccent} castShadow>
-        <cylinderGeometry args={[0.38, 0.44, 0.05, 28]} />
+      <mesh position={[0, 0.25, 0]} material={goldMat} castShadow>
+        <cylinderGeometry args={[0.39, 0.45, 0.05, 32]} />
       </mesh>
       {/* Tapered Stem Column */}
-      <mesh position={[0, 0.72, 0]} material={darkMetal} castShadow receiveShadow>
-        <cylinderGeometry args={[0.22, 0.32, 0.9, 28]} />
+      <mesh position={[0, 0.72, 0]} material={darkObsidian} castShadow receiveShadow>
+        <cylinderGeometry args={[0.22, 0.33, 0.9, 32]} />
       </mesh>
       {/* Upper Collar */}
-      <mesh position={[0, 1.2, 0]} material={darkMetal} castShadow>
-        <cylinderGeometry args={[0.38, 0.24, 0.22, 28]} />
+      <mesh position={[0, 1.2, 0]} material={darkObsidian} castShadow>
+        <cylinderGeometry args={[0.38, 0.24, 0.22, 32]} />
       </mesh>
       {/* Gold Crown Band */}
-      <mesh position={[0, 1.34, 0]} material={goldAccent} castShadow>
-        <torusGeometry args={[0.32, 0.04, 16, 28]} />
+      <mesh position={[0, 1.34, 0]} material={goldMat} castShadow>
+        <torusGeometry args={[0.33, 0.045, 16, 32]} />
       </mesh>
       {/* Imperial Cross Apex */}
-      <mesh position={[0, 1.55, 0]} material={goldAccent} castShadow>
-        <boxGeometry args={[0.08, 0.3, 0.08]} />
+      <mesh position={[0, 1.55, 0]} material={goldMat} castShadow>
+        <boxGeometry args={[0.08, 0.32, 0.08]} />
       </mesh>
-      <mesh position={[0, 1.6, 0]} material={goldAccent} castShadow>
-        <boxGeometry args={[0.26, 0.08, 0.08]} />
+      <mesh position={[0, 1.6, 0]} material={goldMat} castShadow>
+        <boxGeometry args={[0.28, 0.08, 0.08]} />
       </mesh>
     </group>
   );
 };
 
-// -------------------------------------------------------------
-// Queen 3D Procedural Mesh
-// -------------------------------------------------------------
 const QueenMesh: React.FC<{ opacity: number; scale: number; position: [number, number, number] }> = ({
   opacity,
   scale,
   position,
 }) => {
-  const { darkMetal, goldAccent } = usePieceMaterials(opacity);
+  const { darkObsidian, sovereignGold } = useSharedMaterials(opacity);
 
   return (
     <group position={position} scale={[scale, scale, scale]}>
-      <mesh position={[0, 0.12, 0]} material={darkMetal} castShadow receiveShadow>
+      <mesh position={[0, 0.12, 0]} material={darkObsidian} castShadow receiveShadow>
         <cylinderGeometry args={[0.42, 0.48, 0.24, 24]} />
       </mesh>
-      <mesh position={[0, 0.68, 0]} material={darkMetal} castShadow receiveShadow>
+      <mesh position={[0, 0.68, 0]} material={darkObsidian} castShadow receiveShadow>
         <cylinderGeometry args={[0.22, 0.32, 0.88, 24]} />
       </mesh>
-      <mesh position={[0, 1.18, 0]} rotation={[Math.PI / 2, 0, 0]} material={goldAccent} castShadow>
+      <mesh position={[0, 1.18, 0]} rotation={[Math.PI / 2, 0, 0]} material={sovereignGold} castShadow>
         <torusGeometry args={[0.24, 0.05, 12, 24]} />
       </mesh>
-      <mesh position={[0, 1.3, 0]} material={goldAccent} castShadow>
+      <mesh position={[0, 1.3, 0]} material={sovereignGold} castShadow>
         <sphereGeometry args={[0.13, 20, 20]} />
       </mesh>
     </group>
   );
 };
 
-// -------------------------------------------------------------
-// Rook 3D Procedural Mesh
-// -------------------------------------------------------------
 const RookMesh: React.FC<{ opacity: number; scale: number; position: [number, number, number] }> = ({
   opacity,
   scale,
   position,
 }) => {
-  const { darkMetal, goldAccent } = usePieceMaterials(opacity);
+  const { darkObsidian, sovereignGold } = useSharedMaterials(opacity);
 
   return (
     <group position={position} scale={[scale, scale, scale]}>
-      <mesh position={[0, 0.1, 0]} material={darkMetal} castShadow receiveShadow>
+      <mesh position={[0, 0.1, 0]} material={darkObsidian} castShadow receiveShadow>
         <cylinderGeometry args={[0.38, 0.42, 0.2, 24]} />
       </mesh>
-      <mesh position={[0, 0.55, 0]} material={darkMetal} castShadow receiveShadow>
+      <mesh position={[0, 0.55, 0]} material={darkObsidian} castShadow receiveShadow>
         <cylinderGeometry args={[0.26, 0.33, 0.7, 24]} />
       </mesh>
-      <mesh position={[0, 0.95, 0]} material={goldAccent} castShadow receiveShadow>
+      <mesh position={[0, 0.95, 0]} material={sovereignGold} castShadow receiveShadow>
         <cylinderGeometry args={[0.36, 0.28, 0.12, 24]} />
       </mesh>
-      <mesh position={[0, 1.08, 0]} material={darkMetal} castShadow receiveShadow>
+      <mesh position={[0, 1.08, 0]} material={darkObsidian} castShadow receiveShadow>
         <cylinderGeometry args={[0.36, 0.36, 0.16, 24, 1, true]} />
       </mesh>
     </group>
   );
 };
 
-// -------------------------------------------------------------
-// Bishop 3D Procedural Mesh
-// -------------------------------------------------------------
 const BishopMesh: React.FC<{ opacity: number; scale: number; position: [number, number, number] }> = ({
   opacity,
   scale,
   position,
 }) => {
-  const { darkMetal, goldAccent } = usePieceMaterials(opacity);
+  const { darkObsidian, sovereignGold } = useSharedMaterials(opacity);
 
   return (
     <group position={position} scale={[scale, scale, scale]}>
-      <mesh position={[0, 0.1, 0]} material={darkMetal} castShadow receiveShadow>
+      <mesh position={[0, 0.1, 0]} material={darkObsidian} castShadow receiveShadow>
         <cylinderGeometry args={[0.36, 0.42, 0.2, 24]} />
       </mesh>
-      <mesh position={[0, 0.58, 0]} material={darkMetal} castShadow receiveShadow>
+      <mesh position={[0, 0.58, 0]} material={darkObsidian} castShadow receiveShadow>
         <cylinderGeometry args={[0.18, 0.26, 0.6, 24]} />
       </mesh>
-      <mesh position={[0, 1.15, 0]} material={darkMetal} castShadow receiveShadow>
+      <mesh position={[0, 1.15, 0]} material={darkObsidian} castShadow receiveShadow>
         <sphereGeometry args={[0.23, 20, 20]} />
       </mesh>
-      <mesh position={[0, 1.42, 0]} material={goldAccent} castShadow>
+      <mesh position={[0, 1.42, 0]} material={sovereignGold} castShadow>
         <sphereGeometry args={[0.07, 12, 12]} />
       </mesh>
     </group>
   );
 };
 
-// -------------------------------------------------------------
-// Knight 3D Procedural Mesh
-// -------------------------------------------------------------
 const KnightMesh: React.FC<{
   position: [number, number, number];
   rotationY: number;
@@ -180,21 +203,21 @@ const KnightMesh: React.FC<{
   scale: number;
   highlight?: boolean;
 }> = ({ position, rotationY, opacity, scale, highlight = false }) => {
-  const { darkMetal, goldAccent } = usePieceMaterials(opacity);
+  const { darkObsidian, sovereignGold } = useSharedMaterials(opacity);
 
   const highlightMat = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#5ED6E6'),
-      emissive: new THREE.Color('#5B8CFF'),
-      emissiveIntensity: highlight ? 0.6 : 0.0,
+      color: new THREE.Color('#5DD6E6'),
+      emissive: new THREE.Color('#4D7CFE'),
+      emissiveIntensity: highlight ? 0.7 : 0.0,
       metalness: 0.9,
-      roughness: 0.18,
+      roughness: 0.16,
       transparent: true,
       opacity: Math.max(0, Math.min(1, opacity)),
     });
   }, [opacity, highlight]);
 
-  const bodyMat = highlight ? highlightMat : darkMetal;
+  const bodyMat = highlight ? highlightMat : darkObsidian;
 
   return (
     <group position={position} rotation={[0, rotationY, 0]} scale={[scale, scale, scale]}>
@@ -210,44 +233,41 @@ const KnightMesh: React.FC<{
       <mesh position={[0, 0.72, 0.32]} rotation={[0.42, 0, 0]} material={bodyMat} castShadow>
         <boxGeometry args={[0.2, 0.22, 0.26]} />
       </mesh>
-      <mesh position={[-0.08, 1.05, 0.02]} rotation={[0.2, 0, -0.2]} material={goldAccent}>
+      <mesh position={[-0.08, 1.05, 0.02]} rotation={[0.2, 0, -0.2]} material={sovereignGold}>
         <coneGeometry args={[0.06, 0.2, 12]} />
       </mesh>
-      <mesh position={[0.08, 1.05, 0.02]} rotation={[0.2, 0, 0.2]} material={goldAccent}>
+      <mesh position={[0.08, 1.05, 0.02]} rotation={[0.2, 0, 0.2]} material={sovereignGold}>
         <coneGeometry args={[0.06, 0.2, 12]} />
       </mesh>
-      <mesh position={[0.13, 0.86, 0.22]} material={goldAccent}>
+      <mesh position={[0.13, 0.86, 0.22]} material={sovereignGold}>
         <sphereGeometry args={[0.03, 8, 8]} />
       </mesh>
-      <mesh position={[-0.13, 0.86, 0.22]} material={goldAccent}>
+      <mesh position={[-0.13, 0.86, 0.22]} material={sovereignGold}>
         <sphereGeometry args={[0.03, 8, 8]} />
       </mesh>
     </group>
   );
 };
 
-// -------------------------------------------------------------
-// Pawn 3D Procedural Mesh
-// -------------------------------------------------------------
 const PawnMesh: React.FC<{ opacity: number; scale: number; position: [number, number, number] }> = ({
   opacity,
   scale,
   position,
 }) => {
-  const { darkMetal, goldAccent } = usePieceMaterials(opacity);
+  const { darkObsidian, sovereignGold } = useSharedMaterials(opacity);
 
   return (
     <group position={position} scale={[scale, scale, scale]}>
-      <mesh position={[0, 0.08, 0]} material={darkMetal} castShadow receiveShadow>
+      <mesh position={[0, 0.08, 0]} material={darkObsidian} castShadow receiveShadow>
         <cylinderGeometry args={[0.3, 0.36, 0.16, 20]} />
       </mesh>
-      <mesh position={[0, 0.44, 0]} material={darkMetal} castShadow receiveShadow>
+      <mesh position={[0, 0.44, 0]} material={darkObsidian} castShadow receiveShadow>
         <cylinderGeometry args={[0.16, 0.24, 0.48, 20]} />
       </mesh>
-      <mesh position={[0, 0.74, 0]} material={goldAccent} castShadow receiveShadow>
+      <mesh position={[0, 0.74, 0]} material={sovereignGold} castShadow receiveShadow>
         <cylinderGeometry args={[0.22, 0.18, 0.06, 20]} />
       </mesh>
-      <mesh position={[0, 0.94, 0]} material={darkMetal} castShadow receiveShadow>
+      <mesh position={[0, 0.94, 0]} material={darkObsidian} castShadow receiveShadow>
         <sphereGeometry args={[0.22, 20, 20]} />
       </mesh>
     </group>
@@ -255,19 +275,19 @@ const PawnMesh: React.FC<{ opacity: number; scale: number; position: [number, nu
 };
 
 // -------------------------------------------------------------
-// Interactive 3D Chessboard Grid with Progressive Emergence & Ripple
+// Interactive 3D Chessboard Grid: Progressive Tile Materialization
 // -------------------------------------------------------------
 const ChessGrid3D: React.FC<{
   progress: number;
   landingPulse: number;
 }> = ({ progress, landingPulse }) => {
-  // Stage 02: Board emerges 1.5s -> 3.0s (progress 0.125 -> 0.25)
-  const gridAlpha = Math.max(0, Math.min(1, (progress - 0.12) / 0.13));
-  const boardY = -0.6 * (1 - gridAlpha);
+  // Scene 02: 2.0s -> 4.0s (0.13 to 0.27). As camera glides over, tiles materialize from center out
+  const boardBuildProgress = smoothstep(0.13, 0.28, progress);
+  const boardY = -0.5 * (1 - boardBuildProgress);
 
   const tiles = useMemo(() => {
-    const list: { x: number; z: number; isWhite: boolean; distToLanding: number }[] = [];
-    const landingX = -0.5; // d5 square
+    const list: { x: number; z: number; isWhite: boolean; distToCenter: number; distToLanding: number }[] = [];
+    const landingX = -0.5; // d5
     const landingZ = -0.5;
 
     for (let r = 0; r < 8; r++) {
@@ -275,8 +295,9 @@ const ChessGrid3D: React.FC<{
         const x = c - 3.5;
         const z = r - 3.5;
         const isWhite = (r + c) % 2 === 1;
-        const dist = Math.hypot(x - landingX, z - landingZ);
-        list.push({ x, z, isWhite, distToLanding: dist });
+        const distToCenter = Math.hypot(x, z);
+        const distToLanding = Math.hypot(x - landingX, z - landingZ);
+        list.push({ x, z, isWhite, distToCenter, distToLanding });
       }
     }
     return list;
@@ -288,30 +309,35 @@ const ChessGrid3D: React.FC<{
       <mesh position={[0, -0.06, 0]} receiveShadow>
         <boxGeometry args={[8.8, 0.12, 8.8]} />
         <meshStandardMaterial
-          color="#0D1117"
+          color="#0B1017"
           roughness={0.4}
-          metalness={0.7}
+          metalness={0.75}
           transparent={true}
-          opacity={gridAlpha * 0.95}
+          opacity={boardBuildProgress * 0.98}
         />
       </mesh>
 
-      {/* Gold Inner Perimeter Laser Wire */}
+      {/* Gold Inner Perimeter Laser Line */}
       <lineSegments>
         <edgesGeometry args={[new THREE.BoxGeometry(8.05, 0.02, 8.05)]} />
-        <lineBasicMaterial color="#C9A227" transparent opacity={gridAlpha * 0.6} />
+        <lineBasicMaterial color="#D6AF36" transparent opacity={boardBuildProgress * 0.7} />
       </lineSegments>
 
       {/* Individual 64 Chessboard Squares */}
       {tiles.map((tile, idx) => {
-        // Dynamic ripple from Knight landing
-        const wave =
+        // Tiles emerge based on wave outward from center
+        const tileDelay = (tile.distToCenter / 5.2) * 0.12;
+        const tileAlpha = smoothstep(0.14 + tileDelay, 0.26 + tileDelay, progress);
+        const tileLift = (1 - tileAlpha) * -0.4;
+
+        // Dynamic wave ripple from Knight's landing impact
+        const rippleWave =
           landingPulse > 0
             ? Math.max(
                 0,
-                Math.sin(Math.max(0, landingPulse * 4 - tile.distToLanding * 0.75)) *
-                  Math.exp(-tile.distToLanding * 0.3) *
-                  0.15
+                Math.sin(Math.max(0, landingPulse * 4.2 - tile.distToLanding * 0.8)) *
+                  Math.exp(-tile.distToLanding * 0.28) *
+                  0.18
               )
             : 0;
 
@@ -319,48 +345,48 @@ const ChessGrid3D: React.FC<{
         const isStartSquare = Math.abs(tile.x - 1.5) < 0.1 && Math.abs(tile.z - 1.5) < 0.1;
         const isKingSquare = Math.abs(tile.x - 0.5) < 0.1 && Math.abs(tile.z - 0.5) < 0.1;
 
-        let tileColor = tile.isWhite ? '#F2EFE7' : '#151A21';
+        let tileColor = tile.isWhite ? '#F2EFE7' : '#0D131C';
         let emissiveColor = '#000000';
         let emissiveIntensity = 0;
 
-        // Tactical highlight before jump (5.0s to 5.6s -> progress 0.41 to 0.47)
-        if (progress >= 0.41 && progress < 0.48) {
+        // Tactical highlight before jump (Scene 04: 0.46 to 0.53)
+        if (progress >= 0.46 && progress < 0.53) {
           if (isStartSquare) {
-            emissiveColor = '#5ED6E6';
-            emissiveIntensity = 0.5;
+            emissiveColor = '#5DD6E6';
+            emissiveIntensity = 0.55;
           } else if (isLandingSquare) {
-            emissiveColor = '#C9A227';
-            emissiveIntensity = 0.4;
+            emissiveColor = '#D6AF36';
+            emissiveIntensity = 0.45;
           }
         }
 
         if (isLandingSquare && landingPulse > 0) {
-          emissiveColor = '#5ED6E6';
-          emissiveIntensity = Math.min(1, landingPulse * 1.5);
+          emissiveColor = '#5DD6E6';
+          emissiveIntensity = Math.min(1, landingPulse * 1.6);
         } else if (isKingSquare) {
-          emissiveColor = '#C9A227';
-          emissiveIntensity = 0.25 * gridAlpha;
-        } else if (wave > 0.05) {
-          emissiveColor = '#5B8CFF';
-          emissiveIntensity = wave * 2.2;
+          emissiveColor = '#D6AF36';
+          emissiveIntensity = 0.28 * boardBuildProgress;
+        } else if (rippleWave > 0.04) {
+          emissiveColor = '#4D7CFE';
+          emissiveIntensity = rippleWave * 2.4;
         }
 
         return (
           <mesh
             key={idx}
-            position={[tile.x, wave, tile.z]}
+            position={[tile.x, tileLift + rippleWave, tile.z]}
             receiveShadow
-            castShadow={wave > 0.02}
+            castShadow={rippleWave > 0.02}
           >
             <boxGeometry args={[0.96, 0.08, 0.96]} />
             <meshStandardMaterial
               color={tileColor}
               emissive={emissiveColor}
               emissiveIntensity={emissiveIntensity}
-              roughness={tile.isWhite ? 0.35 : 0.2}
-              metalness={tile.isWhite ? 0.08 : 0.65}
+              roughness={tile.isWhite ? 0.32 : 0.18}
+              metalness={tile.isWhite ? 0.08 : 0.72}
               transparent={true}
-              opacity={gridAlpha}
+              opacity={tileAlpha}
             />
           </mesh>
         );
@@ -370,22 +396,21 @@ const ChessGrid3D: React.FC<{
 };
 
 // -------------------------------------------------------------
-// Knight Trajectory Arc & Particles
+// Knight Move Trajectory Arc
 // -------------------------------------------------------------
 const TrajectoryArc: React.FC<{ progress: number }> = ({ progress }) => {
-  // Knight move occurs between progress 0.46 and 0.57 (5.5s to 6.8s)
-  const moveT = Math.max(0, Math.min(1, (progress - 0.46) / 0.11));
+  // Knight move takes place smoothly between 0.50 and 0.60 (7.2s to 8.7s)
+  const moveT = smoothstep(0.50, 0.60, progress);
 
-  // Trajectory curve from f3 (1.5, 0, 1.5) to d5 (-0.5, 0, -0.5)
   const curve = useMemo(() => {
     return new THREE.QuadraticBezierCurve3(
       new THREE.Vector3(1.5, 0.05, 1.5),
-      new THREE.Vector3(0.5, 1.8, 0.5), // Peak arc apex
+      new THREE.Vector3(0.5, 1.85, 0.5), // Peak arc apex
       new THREE.Vector3(-0.5, 0.05, -0.5)
     );
   }, []);
 
-  const linePoints = useMemo(() => curve.getPoints(40), [curve]);
+  const linePoints = useMemo(() => curve.getPoints(42), [curve]);
   const activePointCount = Math.floor(moveT * linePoints.length);
   const activePoints = useMemo(() => linePoints.slice(0, Math.max(2, activePointCount)), [
     linePoints,
@@ -397,8 +422,8 @@ const TrajectoryArc: React.FC<{ progress: number }> = ({ progress }) => {
     return new THREE.BufferGeometry().setFromPoints(activePoints);
   }, [activePoints]);
 
-  // Also show tentative glowing line right before move (0.42 to 0.46)
-  if (progress >= 0.42 && progress < 0.46) {
+  // Tentative guiding line right before move (0.46 to 0.50)
+  if (progress >= 0.46 && progress < 0.50) {
     const fullGeo = new THREE.BufferGeometry().setFromPoints(linePoints);
     return (
       <primitive
@@ -406,11 +431,11 @@ const TrajectoryArc: React.FC<{ progress: number }> = ({ progress }) => {
           new THREE.Line(
             fullGeo,
             new THREE.LineDashedMaterial({
-              color: '#5ED6E6',
-              dashSize: 0.2,
-              gapSize: 0.1,
+              color: '#5DD6E6',
+              dashSize: 0.25,
+              gapSize: 0.12,
               transparent: true,
-              opacity: 0.4,
+              opacity: 0.45,
             })
           )
         }
@@ -418,14 +443,14 @@ const TrajectoryArc: React.FC<{ progress: number }> = ({ progress }) => {
     );
   }
 
-  if (!lineGeo || moveT <= 0.05 || moveT >= 0.98) return null;
+  if (!lineGeo || moveT <= 0.04 || moveT >= 0.98) return null;
 
   return (
     <primitive
       object={
         new THREE.Line(
           lineGeo,
-          new THREE.LineBasicMaterial({ color: '#5ED6E6', transparent: true, opacity: 0.85 })
+          new THREE.LineBasicMaterial({ color: '#5DD6E6', transparent: true, opacity: 0.85 })
         )
       }
     />
@@ -433,16 +458,15 @@ const TrajectoryArc: React.FC<{ progress: number }> = ({ progress }) => {
 };
 
 // -------------------------------------------------------------
-// Digital Chess Universe Spatial Elements (0.58 -> 0.75, 7s - 9s)
+// Scene 05: The Chess Universe Spatial Environment
 // -------------------------------------------------------------
 const ChessUniverseEnvironment: React.FC<{ progress: number }> = ({ progress }) => {
-  // Emerges between 0.58 and 0.75 (7.0s - 9.0s), persists through logo
-  const universeAlpha = Math.max(0, Math.min(1, (progress - 0.58) / 0.14));
+  const universeAlpha = smoothstep(0.60, 0.74, progress);
   const groupRef = useRef<THREE.Group>(null);
 
   useFrame((_, delta) => {
     if (groupRef.current) {
-      groupRef.current.rotation.y += delta * 0.08;
+      groupRef.current.rotation.y += delta * 0.06;
     }
   });
 
@@ -450,50 +474,50 @@ const ChessUniverseEnvironment: React.FC<{ progress: number }> = ({ progress }) 
 
   return (
     <group ref={groupRef}>
-      {/* 1. Distant Floating Secondary Chessboard Platforms */}
+      {/* 1. Distant Floating Secondary Platforms */}
       {[
-        { pos: [-14, 4, -12] as [number, number, number], rot: [0.3, 0.4, -0.2] as [number, number, number], scale: 0.35 },
-        { pos: [15, -3, -14] as [number, number, number], rot: [-0.2, -0.5, 0.1] as [number, number, number], scale: 0.4 },
-        { pos: [-12, -5, 10] as [number, number, number], rot: [0.4, -0.2, 0.3] as [number, number, number], scale: 0.3 },
+        { pos: [-15, 5, -14] as [number, number, number], rot: [0.25, 0.35, -0.15] as [number, number, number], scale: 0.38 },
+        { pos: [16, -4, -16] as [number, number, number], rot: [-0.18, -0.42, 0.1] as [number, number, number], scale: 0.42 },
+        { pos: [-14, -6, 12] as [number, number, number], rot: [0.35, -0.15, 0.25] as [number, number, number], scale: 0.34 },
       ].map((plat, idx) => (
         <group key={idx} position={plat.pos} rotation={plat.rot} scale={[plat.scale, plat.scale, plat.scale]}>
           <mesh>
             <boxGeometry args={[8.8, 0.2, 8.8]} />
             <meshStandardMaterial
-              color="#0D1117"
+              color="#0B1017"
               wireframe
               transparent
-              opacity={universeAlpha * 0.3}
+              opacity={universeAlpha * 0.35}
             />
           </mesh>
           <lineSegments>
             <edgesGeometry args={[new THREE.BoxGeometry(8.8, 0.2, 8.8)]} />
-            <lineBasicMaterial color="#5B8CFF" transparent opacity={universeAlpha * 0.4} />
+            <lineBasicMaterial color="#4D7CFE" transparent opacity={universeAlpha * 0.45} />
           </lineSegments>
         </group>
       ))}
 
       {/* 2. Concentric Digital Spatial Rings */}
-      <group position={[0, 1.2, 0]} rotation={[0.35, 0, 0.2]}>
+      <group position={[0, 1.2, 0]} rotation={[0.3, 0, 0.18]}>
         <mesh>
-          <torusGeometry args={[8.5, 0.02, 16, 64]} />
-          <meshBasicMaterial color="#5ED6E6" transparent opacity={universeAlpha * 0.45} />
+          <torusGeometry args={[9.2, 0.018, 16, 64]} />
+          <meshBasicMaterial color="#5DD6E6" transparent opacity={universeAlpha * 0.4} />
         </mesh>
-        <mesh rotation={[0.5, 0.3, 0]}>
-          <torusGeometry args={[11.2, 0.015, 16, 64]} />
-          <meshBasicMaterial color="#C9A227" transparent opacity={universeAlpha * 0.35} />
+        <mesh rotation={[0.45, 0.25, 0]}>
+          <torusGeometry args={[12.4, 0.015, 16, 64]} />
+          <meshBasicMaterial color="#D6AF36" transparent opacity={universeAlpha * 0.35} />
         </mesh>
       </group>
 
-      {/* 3. Celestial Orbit Spheres */}
+      {/* 3. Celestial Orbital Node Markers */}
       {[
-        { pos: [7.2, 2.5, -4] as [number, number, number], color: '#5ED6E6', r: 0.12 },
-        { pos: [-8.1, 3.2, 5] as [number, number, number], color: '#E8C75A', r: 0.15 },
-        { pos: [4.5, -2.8, 9] as [number, number, number], color: '#5B8CFF', r: 0.1 },
+        { pos: [8.5, 3.2, -5] as [number, number, number], color: '#5DD6E6', r: 0.14 },
+        { pos: [-9.2, 4.1, 6] as [number, number, number], color: '#F0D477', r: 0.16 },
+        { pos: [5.8, -3.2, 10] as [number, number, number], color: '#4D7CFE', r: 0.12 },
       ].map((node, i) => (
         <mesh key={i} position={node.pos}>
           <sphereGeometry args={[node.r, 12, 12]} />
-          <meshBasicMaterial color={node.color} transparent opacity={universeAlpha * 0.7} />
+          <meshBasicMaterial color={node.color} transparent opacity={universeAlpha * 0.75} />
         </mesh>
       ))}
     </group>
@@ -501,35 +525,41 @@ const ChessUniverseEnvironment: React.FC<{ progress: number }> = ({ progress }) 
 };
 
 // -------------------------------------------------------------
-// Main 3D Canvas Scene Content with 12-Second Choreography
+// Master Continuous 3D Scene Controller
 // -------------------------------------------------------------
-export const ChessVerseScene3D: React.FC<ChessVerseScene3DProps> = ({ progress }) => {
+export const ChessVerseScene3D: React.FC<ChessVerseScene3DProps> = ({
+  progress,
+  isTransitioningToApp = false,
+}) => {
   const cameraTarget = useRef(new THREE.Vector3(0, 0, 0));
 
   // ---------------------------------------------------------
-  // TIMELINE CHOREOGRAPHY:
-  // 0.0s - 1.5s (0.00 - 0.125): The Void (pure dark, faint light)
-  // 1.5s - 3.0s (0.125 - 0.25): The Board Emerges
-  // 3.0s - 5.0s (0.25 - 0.42): The Pieces Arrive (Pawn -> Bishop -> Rook -> Knight -> Queen -> King)
-  // 5.0s - 7.0s (0.42 - 0.58): The First Move (Knight focus, pause, leap to d5, pulse)
-  // 7.0s - 9.0s (0.58 - 0.75): The Chess Universe (Pull-back, floating platforms, notation rings)
-  // 9.0s - 11.0s (0.75 - 0.92): ChessVerse Logo Formation (Perspective convergence)
-  // 11.0s - 12.0s (0.92 - 1.00): Transition to Main App
+  // UNIFIED MOTION TIMELINE (12 - 15 Seconds continuous shot):
+  // 0.00 - 0.13 (0s - 2s):   THE VOID (Point of light in deep distance, slow glide forward)
+  // 0.13 - 0.27 (2s - 4s):   THE WORLD FORMS (Light passes below, board tiles materialize)
+  // 0.27 - 0.47 (4s - 7s):   THE GAME AWAKENS (Pawn -> Bishop -> Rook -> Knight -> Queen -> King)
+  //                          At 0.40 - 0.47: King moment with controlled rim light & subtle 8° orbit
+  // 0.47 - 0.60 (7s - 9s):   THE MOVE (Attention glides to Knight, smooth leap to d5, energy pulse)
+  // 0.60 - 0.72 (9s - 10.5s): THE CHESSVERSE (Camera pulls back, floating secondary platforms, universe)
+  // 0.72 - 0.86 (10.5s - 12.5s): THE IDENTITY (Particles & lines converge toward center)
+  // 0.86 - 1.00 (12.5s - 15s): ENTER THE APP (Continuous camera dolly THROUGH logo into main board)
   // ---------------------------------------------------------
 
-  // Piece progressive emergence (Stage 03: 0.25 to 0.42)
-  const pawnOpacity = Math.max(0, Math.min(1, (progress - 0.25) / 0.04));
-  const bishopOpacity = Math.max(0, Math.min(1, (progress - 0.28) / 0.04));
-  const rookOpacity = Math.max(0, Math.min(1, (progress - 0.31) / 0.04));
-  const knightEmergence = Math.max(0, Math.min(1, (progress - 0.34) / 0.04));
-  const queenOpacity = Math.max(0, Math.min(1, (progress - 0.37) / 0.04));
-  const kingOpacity = Math.max(0, Math.min(1, (progress - 0.39) / 0.05));
+  // Piece appearance sequence
+  const pawnOpacity = smoothstep(0.26, 0.31, progress);
+  const bishopOpacity = smoothstep(0.29, 0.34, progress);
+  const rookOpacity = smoothstep(0.32, 0.37, progress);
+  const knightEmergence = smoothstep(0.35, 0.40, progress);
+  const queenOpacity = smoothstep(0.38, 0.43, progress);
+  const kingOpacity = smoothstep(0.40, 0.46, progress);
 
-  // The Knight highlight & move (Stage 04: 0.42 to 0.58)
-  const knightHighlight = progress >= 0.42 && progress < 0.47;
-  const knightMoveT = Math.max(0, Math.min(1, (progress - 0.47) / 0.1)); // 5.6s to 6.8s
+  // The King Moment (0.42 to 0.47): Heroic pause & rim highlight
+  const isKingHeroMoment = progress >= 0.41 && progress <= 0.48;
 
-  // Parabolic Knight coordinate positions
+  // Knight Jump (0.50 to 0.60):
+  const knightHighlight = progress >= 0.46 && progress < 0.50;
+  const knightMoveT = smoothstep(0.50, 0.60, progress);
+
   const startPos = new THREE.Vector3(1.5, 0.04, 1.5); // f3
   const endPos = new THREE.Vector3(-0.5, 0.04, -0.5); // d5
   const currentKnightPos = useMemo(() => {
@@ -538,68 +568,88 @@ export const ChessVerseScene3D: React.FC<ChessVerseScene3DProps> = ({ progress }
 
     const x = THREE.MathUtils.lerp(startPos.x, endPos.x, knightMoveT);
     const z = THREE.MathUtils.lerp(startPos.z, endPos.z, knightMoveT);
-    // Smooth parabolic altitude: 4h * t * (1 - t)
-    const y = 4 * 1.8 * knightMoveT * (1 - knightMoveT);
+    // Smooth parabolic arc
+    const y = 4 * 1.85 * knightMoveT * (1 - knightMoveT);
     return new THREE.Vector3(x, y, z);
   }, [knightMoveT]);
 
-  // Landing impact pulse: triggered at progress ~0.57 (6.8s)
-  const landingPulse = Math.max(0, Math.min(1, (progress - 0.57) / 0.12));
+  // Landing impact pulse: triggered at progress 0.60
+  const landingPulse = smoothstep(0.60, 0.70, progress);
 
-  // King scale adjustment
+  // King scale
   const kingScale = 0.8 + 0.25 * kingOpacity;
 
-  // Camera Cinematic Path Across 12 Seconds:
+  // ---------------------------------------------------------
+  // ONE CONTINUOUS CAMERA SHOT (No hard cuts, no teleportation)
+  // ---------------------------------------------------------
   useFrame(({ camera }) => {
-    if (progress < 0.125) {
-      // Stage 1: The Void (Deep distance, tiny drift)
-      camera.position.set(0, 11, 14 - progress * 8);
+    if (progress < 0.13) {
+      // Scene 01: THE VOID (0s - 2s)
+      const t = progress / 0.13;
+      const z = THREE.MathUtils.lerp(18, 14, t);
+      const y = THREE.MathUtils.lerp(12, 10, t);
+      camera.position.set(0, y, z);
       cameraTarget.current.set(0, 0, 0);
-    } else if (progress < 0.25) {
-      // Stage 2: Board Emergence (Slow forward glide down to board)
-      const t = (progress - 0.125) / 0.125;
-      const r = THREE.MathUtils.lerp(13, 9, t);
-      const h = THREE.MathUtils.lerp(10, 6.8, t);
-      camera.position.set(0, h, r);
+    } else if (progress < 0.27) {
+      // Scene 02: THE WORLD FORMS (2s - 4s)
+      const t = (progress - 0.13) / 0.14;
+      const z = THREE.MathUtils.lerp(14, 9.2, t);
+      const y = THREE.MathUtils.lerp(10, 6.4, t);
+      camera.position.set(0, y, z);
       cameraTarget.current.set(0, 0, 0);
-    } else if (progress < 0.42) {
-      // Stage 3: Pieces Arrive (Gentle orbital angle, admiring pieces)
-      const t = (progress - 0.25) / 0.17;
-      const angle = t * 0.35;
-      camera.position.x = Math.sin(angle) * 8.5;
-      camera.position.z = Math.cos(angle) * 8.5;
-      camera.position.y = 5.8;
-      cameraTarget.current.lerp(new THREE.Vector3(0.5, 0.4, 0.5), 0.05);
-    } else if (progress < 0.58) {
-      // Stage 4: The First Move (Focus shifts to Knight on f3, follows flight to d5)
-      const t = (progress - 0.42) / 0.16;
+    } else if (progress < 0.47) {
+      // Scene 03 & THE KING MOMENT (4s - 7s)
+      const t = (progress - 0.27) / 0.20;
+      // Gentle cinematic orbit of 8 degrees around King at [0.5, 0, 0.5]
+      const angle = t * 0.18; // ~10 degrees
+      const radius = THREE.MathUtils.lerp(9.2, 7.8, t);
+      const height = THREE.MathUtils.lerp(6.4, 5.2, t);
+
+      camera.position.x = Math.sin(angle) * radius;
+      camera.position.z = Math.cos(angle) * radius;
+      camera.position.y = height;
+      cameraTarget.current.lerp(new THREE.Vector3(0.5, 0.6, 0.5), 0.06);
+    } else if (progress < 0.60) {
+      // Scene 04: THE MOVE (7s - 9s)
+      // Camera smoothly shifts attention from King to Knight flight
       if (knightMoveT > 0.05 && knightMoveT < 0.95) {
-        cameraTarget.current.lerp(currentKnightPos, 0.1);
-        camera.position.set(currentKnightPos.x + 3.2, 4.2, currentKnightPos.z + 4.8);
+        cameraTarget.current.lerp(currentKnightPos, 0.12);
+        camera.position.set(currentKnightPos.x + 3.0, 4.2, currentKnightPos.z + 4.5);
       } else {
-        camera.position.set(3.8, 4.6, 5.8);
-        cameraTarget.current.lerp(endPos, 0.06);
+        camera.position.lerp(new THREE.Vector3(2.5, 4.4, 5.6), 0.06);
+        cameraTarget.current.lerp(endPos, 0.08);
       }
-    } else if (progress < 0.75) {
-      // Stage 5: The Chess Universe (Grand pull-back revealing wide universe)
-      const t = (progress - 0.58) / 0.17;
-      const pullDist = THREE.MathUtils.lerp(6.5, 14.5, t);
-      const pullHeight = THREE.MathUtils.lerp(4.5, 9.8, t);
-      const angle = 0.4 + t * 0.3;
+    } else if (progress < 0.72) {
+      // Scene 05: THE CHESSVERSE (9s - 10.5s)
+      // Grand pull-back revealing wide universe
+      const t = (progress - 0.60) / 0.12;
+      const pullDist = THREE.MathUtils.lerp(6.2, 14.8, t);
+      const pullHeight = THREE.MathUtils.lerp(4.4, 9.6, t);
+      const angle = THREE.MathUtils.lerp(0.2, 0.48, t);
+
       camera.position.x = Math.sin(angle) * pullDist;
       camera.position.z = Math.cos(angle) * pullDist;
       camera.position.y = pullHeight;
       cameraTarget.current.lerp(new THREE.Vector3(0, 0.2, 0), 0.08);
-    } else if (progress < 0.92) {
-      // Stage 6: ChessVerse Logo Formation (Elevated perspective, pointing into center)
-      const t = (progress - 0.75) / 0.17;
-      camera.position.set(0, THREE.MathUtils.lerp(9.8, 6.2, t), THREE.MathUtils.lerp(14.5, 10.0, t));
+    } else if (progress < 0.86) {
+      // Scene 06: THE IDENTITY (10.5s - 12.5s)
+      // Camera centers, looking toward central horizon where logo forms
+      const t = (progress - 0.72) / 0.14;
+      const y = THREE.MathUtils.lerp(9.6, 6.2, t);
+      const z = THREE.MathUtils.lerp(14.8, 10.2, t);
+      const x = THREE.MathUtils.lerp(camera.position.x, 0, t);
+
+      camera.position.set(x, y, z);
       cameraTarget.current.lerp(new THREE.Vector3(0, 1.2, 0), 0.08);
     } else {
-      // Stage 7: Transition to Main App (Slight zoom inward to merge with dashboard)
-      const t = (progress - 0.92) / 0.08;
-      camera.position.set(0, THREE.MathUtils.lerp(6.2, 4.8, t), THREE.MathUtils.lerp(10.0, 7.5, t));
-      cameraTarget.current.set(0, 0.4, 0);
+      // Scene 07: ENTER THE APP (12.5s - 15s)
+      // Continuous camera dolly THROUGH the logo plane into the active application board
+      const t = (progress - 0.86) / 0.14;
+      const y = THREE.MathUtils.lerp(6.2, 4.8, t);
+      const z = THREE.MathUtils.lerp(10.2, 7.2, t);
+
+      camera.position.set(0, y, z);
+      cameraTarget.current.lerp(new THREE.Vector3(0, 0.2, 0), 0.1);
     }
 
     camera.lookAt(cameraTarget.current);
@@ -607,18 +657,22 @@ export const ChessVerseScene3D: React.FC<ChessVerseScene3DProps> = ({ progress }
 
   return (
     <>
-      {/* Cinematic Dual Warm Gold + Electric Cyan Lighting */}
-      <ambientLight intensity={0.3} color="#0D1117" />
+      {/* Cinematic Lighting System: Warm Gold (#F0D477) + Cool Electric Blue (#4D7CFE) */}
+      <ambientLight intensity={0.3} color="#0D131C" />
       <directionalLight
-        position={[6, 9, 5]}
-        intensity={2.4}
+        position={[6, 10, 5]}
+        intensity={isKingHeroMoment ? 3.0 : 2.5}
         color="#FFF1D0"
         castShadow
         shadow-mapSize={[1024, 1024]}
         shadow-bias={-0.0001}
       />
-      <directionalLight position={[-6, 4, -5]} intensity={1.4} color="#5ED6E6" />
-      <pointLight position={[0, 3, 0]} intensity={1.6} distance={12} color="#E8C75A" />
+      <directionalLight
+        position={[-6, 4, -5]}
+        intensity={isKingHeroMoment ? 1.8 : 1.3}
+        color="#5DD6E6"
+      />
+      <pointLight position={[0, 3, 0]} intensity={1.6} distance={14} color="#D6AF36" />
 
       {/* 3D Chessboard */}
       <ChessGrid3D progress={progress} landingPulse={landingPulse} />
@@ -627,12 +681,12 @@ export const ChessVerseScene3D: React.FC<ChessVerseScene3DProps> = ({ progress }
       <TrajectoryArc progress={progress} />
 
       {/* Revealed Pieces (Curated showcase line on rank 4 & 3) */}
-      {/* 1. Pawn at e2 / d3 */}
+      {/* 1. Pawn at d3 */}
       {pawnOpacity > 0 && (
         <PawnMesh opacity={pawnOpacity} scale={0.8} position={[-1.5, 0.04, 1.5]} />
       )}
 
-      {/* 2. Bishop at c1 / c4 */}
+      {/* 2. Bishop at c4 */}
       {bishopOpacity > 0 && (
         <BishopMesh opacity={bishopOpacity} scale={0.85} position={[-2.5, 0.04, 0.5]} />
       )}
@@ -653,17 +707,22 @@ export const ChessVerseScene3D: React.FC<ChessVerseScene3DProps> = ({ progress }
         />
       )}
 
-      {/* 5. Queen at d1 / d4 */}
+      {/* 5. Queen at d4 */}
       {queenOpacity > 0 && (
         <QueenMesh opacity={queenOpacity} scale={0.92} position={[-0.5, 0.04, 0.5]} />
       )}
 
       {/* 6. The Sovereign King at e4 (Centerpiece) */}
       {kingOpacity > 0 && (
-        <KingMesh opacity={kingOpacity} scale={kingScale} position={[0.5, 0.04, 0.5]} />
+        <KingMesh
+          opacity={kingOpacity}
+          scale={kingScale}
+          position={[0.5, 0.04, 0.5]}
+          isHeroHighlight={isKingHeroMoment}
+        />
       )}
 
-      {/* The Chess Universe Environment (Floating platforms, notation halos) */}
+      {/* Scene 05: The Chess Universe Environment */}
       <ChessUniverseEnvironment progress={progress} />
     </>
   );
