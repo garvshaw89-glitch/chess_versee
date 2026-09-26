@@ -151,7 +151,8 @@ export const DEFAULT_SETTINGS: GameSettings = {
     particles: true,
     reflections: true,
     cameraEffects: true,
-    viewMode: '3d'
+    viewMode: '3d',
+    cinematicIntroOnStartup: true
   },
   sound: {
     enabled: true,

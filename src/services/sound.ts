@@ -383,6 +383,157 @@ class SoundSynthesizer {
   }
 
   /**
+   * Cinematic Void Drone: Ultra-deep sub-bass resonance for Frame 01
+   */
+  public playCinematicVoid() {
+    if (!this.enabled) return;
+    try {
+      this.initContext();
+      if (!this.ctx || !this.masterGain) return;
+      const now = this.ctx.currentTime;
+
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(55, now);
+      osc.frequency.exponentialRampToValueAtTime(40, now + 2.0);
+
+      gain.gain.setValueAtTime(0.01, now);
+      gain.gain.linearRampToValueAtTime(0.2, now + 0.8);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 2.2);
+
+      osc.connect(gain);
+      gain.connect(this.masterGain);
+
+      osc.start(now);
+      osc.stop(now + 2.2);
+    } catch {}
+  }
+
+  /**
+   * Board Emergence Hum: Harmonic frequency sweep
+   */
+  public playBoardEmergence() {
+    if (!this.enabled) return;
+    try {
+      this.initContext();
+      if (!this.ctx || !this.masterGain) return;
+      const now = this.ctx.currentTime;
+
+      const osc1 = this.ctx.createOscillator();
+      const osc2 = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc1.type = 'triangle';
+      osc2.type = 'sine';
+      osc1.frequency.setValueAtTime(110, now);
+      osc1.frequency.exponentialRampToValueAtTime(220, now + 1.5);
+      osc2.frequency.setValueAtTime(164.8, now); // E3
+      osc2.frequency.exponentialRampToValueAtTime(329.6, now + 1.5); // E4
+
+      gain.gain.setValueAtTime(0.01, now);
+      gain.gain.linearRampToValueAtTime(0.18, now + 0.6);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
+
+      osc1.connect(gain);
+      osc2.connect(gain);
+      gain.connect(this.masterGain);
+
+      osc1.start(now);
+      osc2.start(now);
+      osc1.stop(now + 1.8);
+      osc2.stop(now + 1.8);
+    } catch {}
+  }
+
+  /**
+   * Piece Appearance Sweep: Ethereal chime
+   */
+  public playPieceChime(pitchMultiplier: number = 1) {
+    if (!this.enabled) return;
+    try {
+      this.initContext();
+      if (!this.ctx || !this.masterGain) return;
+      const now = this.ctx.currentTime;
+
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(440 * pitchMultiplier, now);
+      osc.frequency.exponentialRampToValueAtTime(659.25 * pitchMultiplier, now + 0.25);
+
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+
+      osc.connect(gain);
+      gain.connect(this.masterGain);
+
+      osc.start(now);
+      osc.stop(now + 0.45);
+    } catch {}
+  }
+
+  /**
+   * Universe Spatial Expansion: Ambient chord swell
+   */
+  public playUniverseExpansion() {
+    if (!this.enabled) return;
+    try {
+      this.initContext();
+      if (!this.ctx || !this.masterGain) return;
+      const now = this.ctx.currentTime;
+      // D minor / F major ethereal spatial swell: D4, F4, A4, C5
+      const notes = [293.66, 349.23, 440.0, 523.25];
+      notes.forEach((freq, idx) => {
+        const osc = this.ctx!.createOscillator();
+        const gain = this.ctx!.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.05);
+
+        gain.gain.setValueAtTime(0.01, now + idx * 0.05);
+        gain.gain.linearRampToValueAtTime(0.12, now + idx * 0.05 + 0.5);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.05 + 2.0);
+
+        osc.connect(gain);
+        gain.connect(this.masterGain!);
+
+        osc.start(now + idx * 0.05);
+        osc.stop(now + idx * 0.05 + 2.0);
+      });
+    } catch {}
+  }
+
+  /**
+   * Logo Convergence & Impact
+   */
+  public playLogoReveal() {
+    if (!this.enabled) return;
+    try {
+      this.initContext();
+      if (!this.ctx || !this.masterGain) return;
+      const now = this.ctx.currentTime;
+
+      // Regal chord: A3, E4, A4, C#5
+      const chord = [220.0, 329.63, 440.0, 554.37];
+      chord.forEach((freq, idx) => {
+        const osc = this.ctx!.createOscillator();
+        const gain = this.ctx!.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.04);
+
+        gain.gain.setValueAtTime(0.2, now + idx * 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.04 + 1.8);
+
+        osc.connect(gain);
+        gain.connect(this.masterGain!);
+
+        osc.start(now + idx * 0.04);
+        osc.stop(now + idx * 0.04 + 1.8);
+      });
+    } catch {}
+  }
+
+  /**
    * Tactical success / puzzle / quiz correct chime
    */
   public playSuccess() {

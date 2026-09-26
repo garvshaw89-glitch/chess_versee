@@ -278,6 +278,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
 
                 <div className="flex items-center justify-between py-2.5">
                   <div>
+                    <span className="text-xs font-medium text-neutral-200 block">Cinematic Intro on Startup</span>
+                    <span className="text-[11px] text-neutral-400">Play full 12s cinematic game opening</span>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={graphics.cinematicIntroOnStartup ?? true}
+                    onChange={(e) => updateGraphics({ cinematicIntroOnStartup: e.target.checked })}
+                    className="w-4 h-4 accent-amber-500 rounded cursor-pointer"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between py-2.5">
+                  <div>
                     <span className="text-xs font-medium text-neutral-200 block">View Mode</span>
                     <span className="text-[11px] text-neutral-400">Toggle between Perspective and 2D Tactical</span>
                   </div>

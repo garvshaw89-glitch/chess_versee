@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { ChessVerseScene3D } from './ChessVerseScene3D';
 import { ChessVerseLogo } from './ChessVerseLogo';
 import { ChessParticleField } from './ChessParticleField';
+import { ChessUniverseHUD } from './ChessUniverseHUD';
 import { soundService } from '../../services/sound';
 import { useSettingsStore } from '../../store/settingsStore';
 
@@ -28,7 +29,7 @@ export const ChessVerseSplash: React.FC<ChessVerseSplashProps> = ({
   onComplete,
   autoPlaySound = true,
 }) => {
-  const { sound } = useSettingsStore();
+  const { sound, graphics } = useSettingsStore();
   const [progress, setProgress] = useState(0); // 0.0 to 1.0
   const [isExiting, setIsExiting] = useState(false);
   const [webglSupported] = useState<boolean>(() => checkWebGLSupport());
@@ -42,11 +43,35 @@ export const ChessVerseSplash: React.FC<ChessVerseSplashProps> = ({
     }
   }, []);
 
-  const soundPlayedRef = useRef({ knight: false, landing: false, logo: false });
-  const startTimeRef = useRef<number | null>(null);
+  // Check if returning user
+  const isReturningUser = useRef(false);
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const visited = localStorage.getItem('chessverse_has_visited_intro');
+      if (visited && graphics.cinematicIntroOnStartup === false) {
+        isReturningUser.current = true;
+      }
+    }
+  }, [graphics.cinematicIntroOnStartup]);
 
-  // Total duration: 3.8 seconds for full cinematic story, or 1.2s for reduced motion
-  const totalDuration = reducedMotion ? 1200 : 3800;
+  // Total Duration:
+  // - Full cinematic: 12.0 seconds (12000 ms)
+  // - Returning user quick version (if enabled): 3.0 seconds
+  // - Reduced motion: 1.5 seconds
+  const totalDuration = reducedMotion ? 1500 : (isReturningUser.current ? 3000 : 12000);
+
+  // Sound cues fired flags
+  const soundCuesRef = useRef({
+    void: false,
+    board: false,
+    pieces: false,
+    knightHop: false,
+    knightLand: false,
+    universe: false,
+    logo: false,
+  });
+
+  const startTimeRef = useRef<number | null>(null);
 
   useEffect(() => {
     let animId: number;
@@ -58,28 +83,56 @@ export const ChessVerseSplash: React.FC<ChessVerseSplashProps> = ({
 
       setProgress(currentProgress);
 
-      // Acoustic cue triggers
+      // Acoustic cue triggers synced to the 12-second cinematic timeline
       if (sound.enabled && autoPlaySound) {
-        // Knight Jump Sound
-        if (currentProgress >= 0.65 && !soundPlayedRef.current.knight) {
-          soundPlayedRef.current.knight = true;
+        // Stage 1 (0.0s - 1.5s): Void sub-bass drone
+        if (currentProgress >= 0.02 && !soundCuesRef.current.void) {
+          soundCuesRef.current.void = true;
+          soundService.playCinematicVoid();
+        }
+        // Stage 2 (1.5s - 3.0s): Board emergence sweep
+        if (currentProgress >= 0.14 && !soundCuesRef.current.board) {
+          soundCuesRef.current.board = true;
+          soundService.playBoardEmergence();
+        }
+        // Stage 3 (3.0s - 5.0s): Piece arrival ethereal chime
+        if (currentProgress >= 0.28 && !soundCuesRef.current.pieces) {
+          soundCuesRef.current.pieces = true;
+          soundService.playPieceChime(1.0);
+        }
+        // Stage 4 (5.0s - 7.0s): Knight move & landing pulse
+        if (currentProgress >= 0.47 && !soundCuesRef.current.knightHop) {
+          soundCuesRef.current.knightHop = true;
           soundService.playMove();
         }
-        // Landing Pulse Sound
-        if (currentProgress >= 0.81 && !soundPlayedRef.current.landing) {
-          soundPlayedRef.current.landing = true;
+        if (currentProgress >= 0.57 && !soundCuesRef.current.knightLand) {
+          soundCuesRef.current.knightLand = true;
           soundService.playCapture();
+        }
+        // Stage 5 (7.0s - 9.0s): Chess universe spatial swell
+        if (currentProgress >= 0.60 && !soundCuesRef.current.universe) {
+          soundCuesRef.current.universe = true;
+          soundService.playUniverseExpansion();
+        }
+        // Stage 6 (9.0s - 11.0s): ChessVerse logo reveal regal chord
+        if (currentProgress >= 0.77 && !soundCuesRef.current.logo) {
+          soundCuesRef.current.logo = true;
+          soundService.playLogoReveal();
         }
       }
 
       if (currentProgress < 1) {
         animId = requestAnimationFrame(animate);
       } else {
-        // Trigger smooth exit transition into the main application
+        // Mark first visit as complete
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('chessverse_has_visited_intro', 'true');
+        }
+        // Seamless exit transition into the main application dashboard
         setIsExiting(true);
         const exitTimer = setTimeout(() => {
           onComplete();
-        }, 550);
+        }, 650);
         return () => clearTimeout(exitTimer);
       }
     };
@@ -101,96 +154,117 @@ export const ChessVerseSplash: React.FC<ChessVerseSplashProps> = ({
   }, [totalDuration, sound.enabled, autoPlaySound, onComplete, reducedMotion]);
 
   const handleSkip = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('chessverse_has_visited_intro', 'true');
+    }
     setIsExiting(true);
     setTimeout(() => {
       onComplete();
     }, 280);
   };
 
-  // Phase computation
-  // Frame 1: 0 - 0.20 (The Void & Central Light)
-  // Frame 2: 0.20 - 0.45 (Grid Emergence)
-  // Frame 3: 0.45 - 0.65 (The King)
-  // Frame 4: 0.65 - 0.82 (The Knight Move)
-  // Frame 5: 0.82 - 1.0 (ChessVerse Formation & Logo)
-  const isLogoVisible = progress >= 0.78;
-  const logoProgress = Math.max(0, Math.min(1, (progress - 0.78) / 0.22));
+  // Determine current active cinematic stage for telemetry HUD
+  const getStageInfo = () => {
+    if (progress < 0.125) return { number: 'STAGE 01', name: 'THE VOID' };
+    if (progress < 0.25) return { number: 'STAGE 02', name: 'THE BOARD EMERGES' };
+    if (progress < 0.42) return { number: 'STAGE 03', name: 'THE PIECES ARRIVE' };
+    if (progress < 0.58) return { number: 'STAGE 04', name: 'THE FIRST MOVE' };
+    if (progress < 0.75) return { number: 'STAGE 05', name: 'THE CHESS UNIVERSE' };
+    if (progress < 0.92) return { number: 'STAGE 06', name: 'CHESSVERSE FORMATION' };
+    return { number: 'STAGE 07', name: 'ENTERING ARENA' };
+  };
+
+  const stageInfo = getStageInfo();
+
+  // Logo Reveal Phase:
+  // Starts at progress 0.75 (9.0s), completes at 0.92 (11.0s), stays through transition
+  const isLogoVisible = progress >= 0.74;
+  const logoProgress = Math.max(0, Math.min(1, (progress - 0.74) / 0.18));
 
   return (
     <div
-      className={`fixed inset-0 z-50 bg-[#07090D] flex items-center justify-center overflow-hidden transition-all duration-500 select-none ${
-        isExiting ? 'opacity-0 scale-[1.03] pointer-events-none' : 'opacity-100 scale-100'
+      className={`fixed inset-0 z-50 bg-[#07090D] flex items-center justify-center overflow-hidden select-none transition-all duration-700 ease-out ${
+        isExiting ? 'opacity-0 scale-[1.04] pointer-events-none' : 'opacity-100 scale-100'
       }`}
-      aria-label="ChessVerse Opening Cinematic"
+      aria-label="ChessVerse Cinematic Introduction"
       role="dialog"
       aria-modal="true"
     >
-      {/* 1. Ambient Background Gradients & Depth */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#121821] via-[#07090D] to-[#040507] opacity-80" />
+      {/* 1. Deep Atmospheric Spatial Background */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#121821] via-[#07090D] to-[#040507] opacity-85" />
 
-      {/* Frame 01: The Central Void Light Source */}
+      {/* 2. Stage 01: The Central Void Light Source */}
       <div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none transition-all duration-1000 ease-out"
         style={{
-          width: progress < 0.25 ? `${progress * 400 + 4}px` : '420px',
-          height: progress < 0.25 ? `${progress * 400 + 4}px` : '420px',
-          background: 'radial-gradient(circle, rgba(201, 162, 39, 0.25) 0%, rgba(94, 214, 230, 0.12) 40%, rgba(7, 9, 13, 0) 70%)',
-          opacity: Math.max(0.2, 1 - (progress > 0.85 ? (progress - 0.85) * 4 : 0)),
+          width: progress < 0.2 ? `${progress * 500 + 4}px` : '460px',
+          height: progress < 0.2 ? `${progress * 500 + 4}px` : '460px',
+          background:
+            'radial-gradient(circle, rgba(201, 162, 39, 0.28) 0%, rgba(94, 214, 230, 0.12) 42%, rgba(7, 9, 13, 0) 70%)',
+          opacity: Math.max(0.2, 1 - (progress > 0.9 ? (progress - 0.9) * 8 : 0)),
           transform: 'translate(-50%, -50%)',
         }}
       />
 
-      {/* 2. Ambient Floating Digital Chess Particles */}
-      <ChessParticleField progress={progress} count={reducedMotion ? 12 : 36} />
+      {/* 3. Ambient Floating Digital Chess Particles */}
+      <ChessParticleField progress={progress} count={reducedMotion ? 12 : 48} />
 
-      {/* 3. 3D WebGL Chessboard & Kinematic Piece Scene */}
+      {/* 4. Cinematic Stage HUD & Floating Notation Guides */}
+      <ChessUniverseHUD
+        progress={progress}
+        stageName={stageInfo.name}
+        stageNumber={stageInfo.number}
+      />
+
+      {/* 5. 3D WebGL Chessboard & Multi-Stage Scene */}
       {webglSupported && !reducedMotion ? (
         <div
           className="absolute inset-0 z-10 transition-opacity duration-700"
-          style={{ opacity: isExiting ? 0.4 : 1 }}
+          style={{ opacity: isExiting ? 0.35 : 1 }}
         >
           <Canvas
             shadows
             dpr={[1, 1.75]}
-            camera={{ position: [0, 8, 12], fov: 42 }}
+            camera={{ position: [0, 11, 14], fov: 42 }}
             gl={{ antialias: true, alpha: true }}
           >
             <ChessVerseScene3D progress={progress} />
           </Canvas>
         </div>
       ) : (
-        /* Graceful 2D Vector Fallback for devices without WebGL or with reduced motion */
+        /* Graceful 2D Fallback for devices without WebGL */
         <div className="absolute inset-0 z-10 flex items-center justify-center opacity-40">
           <div className="w-64 h-64 border border-[#C9A227]/30 rounded-2xl rotate-45 transform scale-75 animate-pulse" />
         </div>
       )}
 
-      {/* 4. Frame 05: Master Logo Reveal Overlay */}
+      {/* 6. Stage 06: Master Logo Reveal Overlay */}
       {isLogoVisible && (
-        <div className="relative z-20 flex flex-col items-center justify-center max-w-lg px-6 animate-in fade-in duration-500">
+        <div className="relative z-30 flex flex-col items-center justify-center max-w-xl px-6 animate-in fade-in duration-700">
           <ChessVerseLogo
             progress={logoProgress}
             size="lg"
             showSubtitle={true}
-            tagline="STRATEGY • PRECISION • DIGITAL DIMENSION"
+            tagline="YOUR MOVE • YOUR UNIVERSE"
           />
         </div>
       )}
 
-      {/* 5. Minimal Cinematic Skip Control */}
-      <div className="absolute bottom-6 right-6 z-30">
+      {/* 7. Subtle Cinematic Skip Control (Bottom-Right) */}
+      <div className="absolute bottom-6 right-6 z-40">
         <button
           onClick={handleSkip}
-          className="px-3.5 py-1.5 rounded-lg bg-[#121821]/80 hover:bg-[#151A21] border border-[#252D38] hover:border-[#C9A227]/50 text-[11px] font-mono tracking-wider uppercase text-[#A7B0BE] hover:text-[#F5F7FA] transition-all backdrop-blur-md flex items-center gap-2 cursor-pointer shadow-lg active:scale-95"
+          className="px-4 py-2 rounded-xl bg-[#121821]/85 hover:bg-[#151A21] border border-[#252D38] hover:border-[#C9A227]/60 text-[11px] font-mono tracking-wider uppercase text-[#A7B0BE] hover:text-[#F5F7FA] transition-all backdrop-blur-md flex items-center gap-2.5 cursor-pointer shadow-xl active:scale-95 group"
           title="Skip cinematic introduction (ESC)"
         >
-          <span>Skip Cinematic</span>
-          <span className="text-[9px] px-1 py-0.5 rounded bg-white/10 font-bold text-[#C9A227]">ESC</span>
+          <span>SKIP INTRO</span>
+          <span className="text-[#C9A227] transition-transform group-hover:translate-x-0.5">→</span>
+          <span className="text-[9px] px-1 py-0.5 rounded bg-white/10 font-bold text-[#A7B0BE]">ESC</span>
         </button>
       </div>
 
-      {/* 6. Subtle Timeline Progress Indicator (Minimal Hairline at bottom) */}
-      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#121821]">
+      {/* 8. Minimal Hairline Timeline Progress Bar (Bottom Edge) */}
+      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#121821] z-40">
         <div
           className="h-full bg-gradient-to-r from-[#C9A227] via-[#5ED6E6] to-[#E8C75A] transition-all duration-75 ease-out"
           style={{ width: `${progress * 100}%` }}

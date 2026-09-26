@@ -129,6 +129,7 @@ export interface GameSettings {
     reflections: boolean;
     cameraEffects: boolean;
     viewMode: '3d' | '2d';
+    cinematicIntroOnStartup?: boolean;
   };
   sound: {
     enabled: boolean;
