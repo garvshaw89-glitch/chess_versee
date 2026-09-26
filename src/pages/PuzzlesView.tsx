@@ -195,7 +195,7 @@ export const PuzzlesView: React.FC<PuzzlesViewProps> = ({ onNavigate, onOpenSett
   }, [status, currentIdx]);
 
   return (
-    <div className="relative w-full h-[calc(100dvh-56px)] md:h-[calc(100dvh-60px)] flex flex-col overflow-hidden bg-neutral-950">
+    <div className="relative w-full h-[calc(100dvh-56px)] md:h-[calc(100dvh-60px)] flex flex-col overflow-hidden bg-[#05070A] text-[#F5F7FA]">
       <div className="w-full max-w-7xl mx-auto h-full flex flex-col lg:flex-row overflow-hidden flex-1">
         {/* 3D Board Area */}
         <div className="relative flex-1 h-[52vh] sm:h-[55vh] lg:h-full flex flex-col items-center justify-between p-1.5 sm:p-4 overflow-hidden min-h-0">

@@ -12,7 +12,8 @@ import {
   Settings, 
   Layers,
   Sparkles,
-  Palette
+  Palette,
+  BarChart2
 } from 'lucide-react';
 import { CameraPreset } from '../../types/chess';
 import { Button3D } from './Button3D';
@@ -20,10 +21,11 @@ import { useNavigationStore } from '../../store/navigationStore';
 
 interface GameControlsBarProps {
   onOpenSettings: () => void;
+  onNavigateToAnalysis?: () => void;
 }
 
-export const GameControlsBar: React.FC<GameControlsBarProps> = ({ onOpenSettings }) => {
-  const { openThemesModal } = useNavigationStore();
+export const GameControlsBar: React.FC<GameControlsBarProps> = ({ onOpenSettings, onNavigateToAnalysis }) => {
+  const { openThemesModal, navigateWithTransition } = useNavigationStore();
   const {
     undoMove,
     resetGame,
@@ -101,6 +103,19 @@ export const GameControlsBar: React.FC<GameControlsBarProps> = ({ onOpenSettings
           icon={<RotateCw className="w-3.5 h-3.5 text-neutral-400" />}
         >
           <span>Flip</span>
+        </Button3D>
+
+        <Button3D
+          variant="secondary"
+          size="sm"
+          onClick={() => {
+            if (onNavigateToAnalysis) onNavigateToAnalysis();
+            else navigateWithTransition('analysis');
+          }}
+          title="Open Stockfish Deep Analysis Engine"
+          icon={<BarChart2 className="w-3.5 h-3.5 text-[#5ED6E6]" />}
+        >
+          <span>Analyze</span>
         </Button3D>
       </div>
 

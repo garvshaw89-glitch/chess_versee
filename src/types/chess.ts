@@ -86,6 +86,7 @@ export interface HistoricalGame {
   id: string;
   date: string;
   opponent: string;
+  opponentRating?: number;
   mode: GameMode;
   result: 'win' | 'loss' | 'draw';
   reason: string;

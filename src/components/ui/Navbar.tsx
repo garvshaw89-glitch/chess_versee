@@ -13,7 +13,11 @@ import {
   Menu,
   X,
   Play,
-  Sparkles
+  Sparkles,
+  Search,
+  Bell,
+  BarChart2,
+  Trophy
 } from 'lucide-react';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useNavigationStore } from '../../store/navigationStore';
@@ -21,8 +25,10 @@ import { useGameStore } from '../../store/gameStore';
 import { soundService } from '../../services/sound';
 import { PremiumButton } from './PremiumButton';
 import { ChessVerseSymbol } from '../splash/ChessVerseSymbol';
+import { GlobalSearchModal } from './GlobalSearchModal';
+import { NotificationsModal } from './NotificationsModal';
 
-export type NavPage = 'landing' | 'play' | '2player' | 'learn' | 'puzzles' | 'profile';
+export type NavPage = 'landing' | 'play' | '2player' | 'learn' | 'puzzles' | 'analysis' | 'tournaments' | 'leaderboard' | 'profile';
 
 interface NavbarProps {
   currentPage: NavPage;
@@ -41,6 +47,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   const { navigateBack, openThemesModal, triggerCinematicSplash } = useNavigationStore();
   const { setGameMode, resetGame, setTwoPlayerSetupOpen } = useGameStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchModalOpen, setSearchModalOpen] = useState(false);
+  const [notificationsModalOpen, setNotificationsModalOpen] = useState(false);
 
   const handleOpenThemes = onOpenThemes || openThemesModal;
 
@@ -59,9 +67,11 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const navItems: { id: NavPage; label: string }[] = [
     { id: 'play', label: 'Arena' },
-    { id: '2player', label: '2-Player' },
-    { id: 'learn', label: 'Academy' },
     { id: 'puzzles', label: 'Puzzles' },
+    { id: 'learn', label: 'Academy' },
+    { id: 'analysis', label: 'Analyze' },
+    { id: 'tournaments', label: 'Tournaments' },
+    { id: 'leaderboard', label: 'Rankings' },
     { id: 'profile', label: 'Career' },
   ];
 
@@ -119,6 +129,31 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Zone 3: 1-2 Primary Actions & Controls */}
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* Universal Search Button */}
+          <button
+            onClick={() => {
+              soundService.playClick();
+              setSearchModalOpen(true);
+            }}
+            title="Global Search & Jump (Cmd+K)"
+            className="p-2 rounded-xl text-neutral-400 hover:text-[#E8C75A] hover:bg-white/5 border border-transparent hover:border-white/10 transition-colors cursor-pointer"
+          >
+            <Search className="w-4 h-4" />
+          </button>
+
+          {/* Dispatch Center Notifications Button */}
+          <button
+            onClick={() => {
+              soundService.playClick();
+              setNotificationsModalOpen(true);
+            }}
+            title="Dispatch Center (Challenges & Milestones)"
+            className="p-2 rounded-xl text-neutral-400 hover:text-[#5ED6E6] hover:bg-white/5 border border-transparent hover:border-white/10 transition-colors cursor-pointer relative"
+          >
+            <Bell className="w-4 h-4" />
+            <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-[#E8C75A] animate-pulse" />
+          </button>
+
           {/* Replay Cinematic Splash Button */}
           <button
             onClick={triggerCinematicSplash}
@@ -196,6 +231,19 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       </header>
 
+      {/* Global Command Palette & Notifications Modals */}
+      <GlobalSearchModal
+        isOpen={searchModalOpen}
+        onClose={() => setSearchModalOpen(false)}
+        onNavigate={handleItemClick}
+      />
+
+      <NotificationsModal
+        isOpen={notificationsModalOpen}
+        onClose={() => setNotificationsModalOpen(false)}
+        onAcceptChallenge={() => handleItemClick('play')}
+      />
+
       {/* Mobile Full-Screen Navigation Drawer Overlay */}
       {mobileMenuOpen && (
         <div className="lg:hidden fixed inset-0 top-[57px] z-50 bg-[#08080a]/98 backdrop-blur-2xl flex flex-col justify-between p-6 overflow-y-auto animate-in fade-in duration-200">
@@ -267,12 +315,14 @@ export const Navbar: React.FC<NavbarProps> = ({
       )}
 
       {/* Mobile Bottom Quick-Action Bar */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#08080a]/95 border-t border-white/5 backdrop-blur-xl px-2 py-1 flex items-center justify-around">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#05070A]/95 border-t border-white/5 backdrop-blur-2xl px-2 py-1.5 flex items-center justify-around">
         {[
+          { id: 'landing' as NavPage, label: 'Citadel', icon: Play },
           { id: 'play' as NavPage, label: 'Arena', icon: Sword },
-          { id: '2player' as NavPage, label: '2P', icon: Users },
-          { id: 'learn' as NavPage, label: 'Academy', icon: GraduationCap },
           { id: 'puzzles' as NavPage, label: 'Puzzles', icon: Puzzle },
+          { id: 'learn' as NavPage, label: 'Academy', icon: GraduationCap },
+          { id: 'analysis' as NavPage, label: 'Analyze', icon: BarChart2 },
+          { id: 'tournaments' as NavPage, label: 'Events', icon: Trophy },
           { id: 'profile' as NavPage, label: 'Career', icon: User },
         ].map((item) => {
           const Icon = item.icon;
@@ -281,8 +331,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               key={item.id}
               onClick={() => handleItemClick(item.id)}
-              className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-lg text-[10px] font-mono transition-transform active:scale-95 cursor-pointer ${
-                isActive ? 'text-amber-400 font-bold' : 'text-neutral-400 hover:text-neutral-200'
+              className={`flex flex-col items-center justify-center py-1 px-1.5 rounded-lg text-[10px] font-mono transition-transform active:scale-95 cursor-pointer ${
+                isActive ? 'text-[#E8C75A] font-bold' : 'text-[#8D98A8] hover:text-[#F5F7FA]'
               }`}
             >
               <Icon className="w-4 h-4 mb-0.5" />

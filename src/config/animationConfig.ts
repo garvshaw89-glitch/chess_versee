@@ -81,6 +81,30 @@ export const ANIMATION_CONFIG = {
       accentColor: '#eab308', // yellow-500
       tagline: 'CAREER STATISTICS & TROPHIES',
       cameraPreset: 'cinematic' as const,
+    },
+    analysis: {
+      label: 'Initializing Deep Stockfish Analysis',
+      symbol: '📊',
+      pieceName: 'Analysis',
+      accentColor: '#5ED6E6',
+      tagline: 'EVALUATE EVERY VARIATION',
+      cameraPreset: 'top' as const,
+    },
+    tournaments: {
+      label: 'Connecting to Championship Brackets',
+      symbol: '🏆',
+      pieceName: 'Trophy',
+      accentColor: '#C9A227',
+      tagline: 'COMPETE IN SWISS ARENAS',
+      cameraPreset: 'cinematic' as const,
+    },
+    leaderboard: {
+      label: 'Fetching FIDE Calibration Standings',
+      symbol: '🌐',
+      pieceName: 'Rankings',
+      accentColor: '#E8C75A',
+      tagline: 'WORLD GRANDMASTER RANKINGS',
+      cameraPreset: 'cinematic' as const,
     }
   }
 };

@@ -16,7 +16,7 @@ export const LearnView: React.FC<LearnViewProps> = () => {
   const { activeLessonId } = useLearnStore();
 
   return (
-    <div className="relative w-full min-h-[calc(100vh-60px)] bg-neutral-950 text-neutral-100 flex flex-col">
+    <div className="relative w-full min-h-[calc(100vh-60px)] bg-[#05070A] text-[#F5F7FA] flex flex-col">
       {activeLessonId ? (
         <LessonPlayer />
       ) : (

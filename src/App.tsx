@@ -11,6 +11,9 @@ import { TwoPlayerView } from './pages/TwoPlayerView';
 import { PuzzlesView } from './pages/PuzzlesView';
 import { LearnView } from './pages/LearnView';
 import { ProfileView } from './pages/ProfileView';
+import { AnalysisView } from './pages/AnalysisView';
+import { TournamentsView } from './pages/TournamentsView';
+import { LeaderboardView } from './pages/LeaderboardView';
 import { SettingsModal } from './components/ui/SettingsModal';
 import { BoardThemesModal } from './components/ui/BoardThemesModal';
 import { TwoPlayerSetupModal } from './components/ui/TwoPlayerSetupModal';
@@ -68,6 +71,15 @@ export default function App() {
           )}
           {currentPage === 'learn' && (
             <LearnView onNavigate={navigateWithTransition} onOpenSettings={openSettings} />
+          )}
+          {currentPage === 'analysis' && (
+            <AnalysisView onNavigate={navigateWithTransition} onOpenSettings={openSettings} />
+          )}
+          {currentPage === 'tournaments' && (
+            <TournamentsView onNavigate={navigateWithTransition} />
+          )}
+          {currentPage === 'leaderboard' && (
+            <LeaderboardView onNavigate={navigateWithTransition} />
           )}
           {currentPage === 'profile' && <ProfileView onNavigate={navigateWithTransition} />}
         </PageTransition>

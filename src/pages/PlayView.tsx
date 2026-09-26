@@ -58,7 +58,7 @@ export const PlayView: React.FC<PlayViewProps> = ({ onNavigate, onOpenSettings }
   const isLandscapeMobile = device.isLandscape && (device.isMobile || device.height < 520);
 
   return (
-    <div className="relative w-full h-[calc(100dvh-56px)] md:h-[calc(100dvh-60px)] flex flex-col overflow-hidden bg-neutral-950">
+    <div className="relative w-full h-[calc(100dvh-56px)] md:h-[calc(100dvh-60px)] flex flex-col overflow-hidden bg-[#05070A]">
       {/* Centered Max-Width Container for Desktop and Ultrawide monitors */}
       <div className="w-full max-w-7xl mx-auto h-full flex flex-col lg:flex-row overflow-hidden flex-1">
         
@@ -195,7 +195,10 @@ export const PlayView: React.FC<PlayViewProps> = ({ onNavigate, onOpenSettings }
           </div>
 
           {/* Game Action Controls */}
-          <GameControlsBar onOpenSettings={onOpenSettings} />
+          <GameControlsBar 
+            onOpenSettings={onOpenSettings} 
+            onNavigateToAnalysis={() => onNavigate('analysis')} 
+          />
         </div>
       </div>
 

@@ -9,6 +9,7 @@ import { AI_OPPONENTS } from '../../services/chessAI';
 import { soundService } from '../../services/sound';
 import { PremiumButton } from '../ui/PremiumButton';
 import { InteractiveBoardPreview } from './InteractiveBoardPreview';
+import { MasterDashboardHub } from './MasterDashboardHub';
 import {
   ArrowRight,
   Play,
@@ -178,6 +179,11 @@ export const LandingExperience: React.FC<LandingExperienceProps> = ({ onNavigate
           </div>
         </div>
       </section>
+
+      {/* ============================================================== */}
+      {/* 01.5 MASTER COMMAND DASHBOARD (TRANSITIONED APPLICATION HOME) */}
+      {/* ============================================================== */}
+      <MasterDashboardHub onNavigate={onNavigate} />
 
       {/* ============================================================== */}
       {/* 02. CONTEXT & THE CRAFT OF MODERN CHESS (STORYTELLING)         */}
