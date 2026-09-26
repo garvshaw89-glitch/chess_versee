@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { Navbar, NavPage } from './components/ui/Navbar';
-import { HeroSection } from './components/landing/HeroSection';
+import { LandingExperience } from './components/landing/LandingExperience';
 import { PlayView } from './pages/PlayView';
 import { TwoPlayerView } from './pages/TwoPlayerView';
 import { PuzzlesView } from './pages/PuzzlesView';
@@ -15,6 +15,8 @@ import { SettingsModal } from './components/ui/SettingsModal';
 import { BoardThemesModal } from './components/ui/BoardThemesModal';
 import { TwoPlayerSetupModal } from './components/ui/TwoPlayerSetupModal';
 import { ToastNotification } from './components/ui/ToastNotification';
+import { CustomCursor } from './components/ui/CustomCursor';
+import { InitialLoader } from './components/ui/InitialLoader';
 import { useNavigationStore } from './store/navigationStore';
 import { PageTransition } from './components/transitions/PageTransition';
 import { TransitionOverlay } from './components/transitions/TransitionOverlay';
@@ -32,8 +34,14 @@ export default function App() {
   } = useNavigationStore();
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col font-sans select-none overflow-x-hidden">
-      {/* Top and Mobile Navigation with 3D button interactions */}
+    <div className="min-h-screen bg-[#08080a] text-neutral-100 flex flex-col font-sans select-none overflow-x-hidden">
+      {/* Agency Custom Cursor (Desktop only, auto-hides on touch) */}
+      <CustomCursor />
+
+      {/* Initial Reveal Sequence (Dismisses fast, under 700ms) */}
+      <InitialLoader />
+
+      {/* Agency Top Navigation Bar */}
       <Navbar
         currentPage={currentPage}
         onNavigate={navigateWithTransition}
@@ -41,10 +49,10 @@ export default function App() {
         onOpenThemes={openThemesModal}
       />
 
-      {/* Main Page Routing with 3D Page Transition System */}
+      {/* Main Page Routing with Cinematic Page Transition System */}
       <main className="flex-1 relative flex flex-col overflow-hidden">
         <PageTransition>
-          {currentPage === 'landing' && <HeroSection onNavigate={navigateWithTransition} />}
+          {currentPage === 'landing' && <LandingExperience onNavigate={navigateWithTransition} />}
           {currentPage === 'play' && (
             <PlayView onNavigate={navigateWithTransition} onOpenSettings={openSettings} />
           )}
@@ -61,10 +69,10 @@ export default function App() {
         </PageTransition>
       </main>
 
-      {/* Global 3D Cinematic Transition Overlay */}
+      {/* Global Cinematic Transition Overlay */}
       <TransitionOverlay />
 
-      {/* Persistent Floating Controls & 3D Modals */}
+      {/* Persistent Floating Controls & Modals */}
       <TwoPlayerSetupModal onStartPlaying={() => navigateWithTransition('play')} />
       <SettingsModal isOpen={settingsOpen} onClose={closeSettings} />
       <BoardThemesModal isOpen={themesModalOpen} onClose={closeThemesModal} />
@@ -72,4 +80,3 @@ export default function App() {
     </div>
   );
 }
-
