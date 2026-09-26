@@ -16,7 +16,7 @@ import { BoardThemesModal } from './components/ui/BoardThemesModal';
 import { TwoPlayerSetupModal } from './components/ui/TwoPlayerSetupModal';
 import { ToastNotification } from './components/ui/ToastNotification';
 import { CustomCursor } from './components/ui/CustomCursor';
-import { InitialLoader } from './components/ui/InitialLoader';
+import { ChessVerseSplash } from './components/splash/ChessVerseSplash';
 import { useNavigationStore } from './store/navigationStore';
 import { PageTransition } from './components/transitions/PageTransition';
 import { TransitionOverlay } from './components/transitions/TransitionOverlay';
@@ -30,16 +30,20 @@ export default function App() {
     closeSettings,
     themesModalOpen,
     openThemesModal,
-    closeThemesModal
+    closeThemesModal,
+    showCinematicSplash,
+    closeCinematicSplash
   } = useNavigationStore();
 
   return (
-    <div className="min-h-screen bg-[#08080a] text-neutral-100 flex flex-col font-sans select-none overflow-x-hidden">
+    <div className="min-h-screen bg-[#07090D] text-neutral-100 flex flex-col font-sans select-none overflow-x-hidden">
       {/* Agency Custom Cursor (Desktop only, auto-hides on touch) */}
       <CustomCursor />
 
-      {/* Initial Reveal Sequence (Dismisses fast, under 700ms) */}
-      <InitialLoader />
+      {/* Cinematic 3D ChessVerse Opening Splash Sequence */}
+      {showCinematicSplash && (
+        <ChessVerseSplash onComplete={closeCinematicSplash} />
+      )}
 
       {/* Agency Top Navigation Bar */}
       <Navbar

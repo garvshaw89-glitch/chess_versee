@@ -12,13 +12,15 @@ import {
   Palette,
   Menu,
   X,
-  Play
+  Play,
+  Sparkles
 } from 'lucide-react';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useNavigationStore } from '../../store/navigationStore';
 import { useGameStore } from '../../store/gameStore';
 import { soundService } from '../../services/sound';
 import { PremiumButton } from './PremiumButton';
+import { ChessVerseSymbol } from '../splash/ChessVerseSymbol';
 
 export type NavPage = 'landing' | 'play' | '2player' | 'learn' | 'puzzles' | 'profile';
 
@@ -36,7 +38,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenThemes
 }) => {
   const { sound, updateSound } = useSettingsStore();
-  const { navigateBack, openThemesModal } = useNavigationStore();
+  const { navigateBack, openThemesModal, triggerCinematicSplash } = useNavigationStore();
   const { setGameMode, resetGame, setTwoPlayerSetupOpen } = useGameStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -67,7 +69,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     <>
       {/* Top Bar: Strict One-Row Three-Zone Contract */}
       <header className="sticky top-0 z-40 w-full bg-[#08080a]/90 border-b border-white/5 backdrop-blur-xl px-4 sm:px-8 py-3 flex items-center justify-between transition-colors">
-        {/* Zone 1: Single Text Element Brand Wordmark */}
+        {/* Zone 1: Single Text Element Brand Wordmark with Sovereign Symbol */}
         <div className="flex items-center gap-3">
           {currentPage !== 'landing' && (
             <button
@@ -85,9 +87,9 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <button
             onClick={() => handleItemClick('landing')}
-            className="flex items-center gap-2 group text-left cursor-pointer outline-none focus-visible:ring-1 focus-visible:ring-amber-400"
+            className="flex items-center gap-2.5 group text-left cursor-pointer outline-none focus-visible:ring-1 focus-visible:ring-amber-400"
           >
-            <span className="font-serif text-amber-400 text-lg group-hover:scale-110 transition-transform">♔</span>
+            <ChessVerseSymbol size={28} glow={false} animated={true} />
             <span className="font-brand text-base sm:text-lg font-bold tracking-[0.14em] text-neutral-100 group-hover:text-amber-300 transition-colors">
               CHESSVERSE
             </span>
@@ -117,6 +119,15 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Zone 3: 1-2 Primary Actions & Controls */}
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* Replay Cinematic Splash Button */}
+          <button
+            onClick={triggerCinematicSplash}
+            title="Replay Cinematic Opening Experience"
+            className="hidden sm:inline-flex p-2 rounded-xl text-neutral-400 hover:text-amber-300 hover:bg-white/5 border border-transparent hover:border-white/10 transition-colors cursor-pointer"
+          >
+            <Sparkles className="w-4 h-4 text-amber-400/80 hover:text-amber-300" />
+          </button>
+
           {/* Audio Synthesizer Toggle */}
           <button
             onClick={() => {

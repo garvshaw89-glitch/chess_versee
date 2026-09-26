@@ -16,6 +16,7 @@ interface NavigationState {
   historyStack: NavPage[];
   settingsOpen: boolean;
   themesModalOpen: boolean;
+  showCinematicSplash: boolean;
 
   // Actions
   navigateWithTransition: (target: NavPage, customLabel?: string) => Promise<void>;
@@ -24,6 +25,8 @@ interface NavigationState {
   closeSettings: () => void;
   openThemesModal: () => void;
   closeThemesModal: () => void;
+  triggerCinematicSplash: () => void;
+  closeCinematicSplash: () => void;
   resetTransitionSafety: () => void;
 }
 
@@ -37,6 +40,16 @@ export const useNavigationStore = create<NavigationState>((set, get) => ({
   historyStack: ['landing'],
   settingsOpen: false,
   themesModalOpen: false,
+  showCinematicSplash: true,
+
+  triggerCinematicSplash: () => {
+    soundService.playClick();
+    set({ showCinematicSplash: true });
+  },
+
+  closeCinematicSplash: () => {
+    set({ showCinematicSplash: false });
+  },
 
   openThemesModal: () => {
     soundService.playButton3DPress('secondary');
