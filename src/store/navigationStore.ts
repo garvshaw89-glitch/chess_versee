@@ -17,6 +17,7 @@ interface NavigationState {
   settingsOpen: boolean;
   themesModalOpen: boolean;
   showCinematicSplash: boolean;
+  splashMorphProgress: number;
 
   // Actions
   navigateWithTransition: (target: NavPage, customLabel?: string) => Promise<void>;
@@ -27,6 +28,7 @@ interface NavigationState {
   closeThemesModal: () => void;
   triggerCinematicSplash: () => void;
   closeCinematicSplash: () => void;
+  setSplashMorphProgress: (progress: number) => void;
   resetTransitionSafety: () => void;
 }
 
@@ -41,14 +43,19 @@ export const useNavigationStore = create<NavigationState>((set, get) => ({
   settingsOpen: false,
   themesModalOpen: false,
   showCinematicSplash: true,
+  splashMorphProgress: 0,
 
   triggerCinematicSplash: () => {
     soundService.playClick();
-    set({ showCinematicSplash: true });
+    set({ showCinematicSplash: true, splashMorphProgress: 0 });
   },
 
   closeCinematicSplash: () => {
-    set({ showCinematicSplash: false });
+    set({ showCinematicSplash: false, splashMorphProgress: 1 });
+  },
+
+  setSplashMorphProgress: (progress: number) => {
+    set({ splashMorphProgress: Math.max(0, Math.min(1, progress)) });
   },
 
   openThemesModal: () => {
