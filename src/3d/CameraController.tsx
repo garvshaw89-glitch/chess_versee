@@ -3,6 +3,7 @@ import { useThree, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import { CameraPreset } from '../types/chess';
+import { useNavigationStore } from '../store/navigationStore';
 
 interface CameraControllerProps {
   preset: CameraPreset;
@@ -48,15 +49,24 @@ export const CameraController: React.FC<CameraControllerProps> = ({
     isTransitioningRef.current = true;
   }, [preset, aspect, portraitScale]);
 
+  const { showCinematicSplash } = useNavigationStore();
+
   useFrame((_, delta) => {
     if (isCinematicActive || preset === 'cinematic') {
-      // Gentle cinematic orbit
-      angleRef.current += delta * 0.15;
       const radius = 10.5 * portraitScale;
-      const x = Math.sin(angleRef.current) * radius;
-      const z = Math.cos(angleRef.current) * radius;
-      camera.position.lerp(new THREE.Vector3(x, 7.5 * portraitScale, z), 0.04);
-      camera.lookAt(0, 0, 0);
+      if (showCinematicSplash) {
+        // Lock to exact initial frame position while splash is running
+        angleRef.current = 0;
+        camera.position.set(0, 7.5 * portraitScale, radius);
+        camera.lookAt(0, 0, 0);
+      } else {
+        // Gentle cinematic orbit beginning seamlessly from the splash exit position
+        angleRef.current += delta * 0.15;
+        const x = Math.sin(angleRef.current) * radius;
+        const z = Math.cos(angleRef.current) * radius;
+        camera.position.lerp(new THREE.Vector3(x, 7.5 * portraitScale, z), 0.04);
+        camera.lookAt(0, 0, 0);
+      }
       if (controlsRef.current) {
         controlsRef.current.target.set(0, 0, 0);
         controlsRef.current.update();

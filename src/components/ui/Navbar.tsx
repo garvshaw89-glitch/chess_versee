@@ -44,7 +44,13 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenThemes
 }) => {
   const { sound, updateSound } = useSettingsStore();
-  const { navigateBack, openThemesModal, triggerCinematicSplash } = useNavigationStore();
+  const { 
+    navigateBack, 
+    openThemesModal, 
+    triggerCinematicSplash,
+    showCinematicSplash,
+    splashMorphProgress 
+  } = useNavigationStore();
   const { setGameMode, resetGame, setTwoPlayerSetupOpen } = useGameStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
@@ -78,7 +84,15 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <>
       {/* Top Bar: Strict One-Row Three-Zone Contract */}
-      <header className="sticky top-0 z-40 w-full bg-[#05070A]/90 border-b border-white/5 backdrop-blur-xl px-4 sm:px-8 py-3 flex items-center justify-between transition-colors">
+      <header 
+        className="sticky top-0 z-40 w-full bg-[#05070A]/90 border-b border-white/5 backdrop-blur-xl px-4 sm:px-8 py-3 flex items-center justify-between transition-colors pointer-events-auto"
+        style={{
+          opacity: showCinematicSplash ? splashMorphProgress : 1,
+          transform: showCinematicSplash ? `translateY(${(1 - splashMorphProgress) * -16}px)` : 'none',
+          pointerEvents: showCinematicSplash && splashMorphProgress < 0.8 ? 'none' : 'auto',
+          transition: 'transform 0.05s ease-out'
+        }}
+      >
         {/* Zone 1: Single Text Element Brand Wordmark with Sovereign Symbol */}
         <div className="flex items-center gap-3">
           {currentPage !== 'landing' && (

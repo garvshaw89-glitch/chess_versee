@@ -37,7 +37,12 @@ interface LandingExperienceProps {
 
 export const LandingExperience: React.FC<LandingExperienceProps> = ({ onNavigate }) => {
   const { setGameMode, resetGame, setTwoPlayerSetupOpen, setAiOpponent } = useGameStore();
-  const { openThemesModal, openSettings } = useNavigationStore();
+  const { 
+    openThemesModal, 
+    openSettings, 
+    showCinematicSplash, 
+    splashMorphProgress 
+  } = useNavigationStore();
   const [selectedBotId, setSelectedBotId] = useState(AI_OPPONENTS[2].id);
   const [synthSoundPlaying, setSynthSoundPlaying] = useState<string | null>(null);
 
@@ -85,11 +90,26 @@ export const LandingExperience: React.FC<LandingExperienceProps> = ({ onNavigate
         </div>
 
         {/* Ambient Depth Scrims */}
-        <div className="absolute inset-0 z-1 pointer-events-none bg-gradient-to-b from-neutral-950/40 via-neutral-950/20 to-[#08080a]" />
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[720px] h-[340px] bg-amber-500/10 blur-[140px] rounded-full pointer-events-none" />
+        <div 
+          className="absolute inset-0 z-1 pointer-events-none bg-gradient-to-b from-neutral-950/40 via-neutral-950/20 to-[#08080a] transition-opacity" 
+          style={{ opacity: showCinematicSplash ? splashMorphProgress : 1 }}
+        />
+        <div 
+          className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[720px] h-[340px] bg-amber-500/10 blur-[140px] rounded-full pointer-events-none transition-opacity" 
+          style={{ opacity: showCinematicSplash ? splashMorphProgress : 1 }}
+        />
 
-        {/* Primary Hero Content Container */}
-        <div className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-12 flex flex-col items-center text-center my-auto">
+        {/* Primary Hero Content Container with Seamless Spatial Morph */}
+        <div 
+          className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-12 flex flex-col items-center text-center my-auto transition-transform ease-out"
+          style={{
+            opacity: showCinematicSplash ? splashMorphProgress : 1,
+            transform: showCinematicSplash 
+              ? `translateY(${(1 - splashMorphProgress) * 28}px) scale(${0.96 + splashMorphProgress * 0.04})` 
+              : 'none',
+            pointerEvents: showCinematicSplash && splashMorphProgress < 0.8 ? 'none' : 'auto',
+          }}
+        >
           {/* Unboxed Editorial Eyebrow */}
           <div className="flex items-center gap-2 text-xs font-mono tracking-widest uppercase text-amber-300/90 mb-6">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
