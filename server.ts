@@ -1,5 +1,6 @@
 import express from "express";
 import path from "path";
+import fs from "fs";
 import { createServer as createViteServer } from "vite";
 
 const PUZZLES = [
@@ -100,10 +101,15 @@ const OPENINGS = [
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  // Support dynamic PORT assigned by Cloud Run / production container environments, defaulting to 3000 for local dev
+  const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
   app.use(express.json());
-  app.use(express.static(path.join(process.cwd(), "public")));
+  
+  const publicPath = path.join(process.cwd(), "public");
+  if (fs.existsSync(publicPath)) {
+    app.use(express.static(publicPath));
+  }
 
   // API Endpoints
   app.get("/api/health", (_req, res) => {
@@ -118,23 +124,27 @@ async function startServer() {
     res.json({ openings: OPENINGS });
   });
 
-  // Vite middleware in dev, static files in production
-  if (process.env.NODE_ENV !== "production") {
+  const distPath = path.join(process.cwd(), "dist");
+  const indexHtmlPath = path.join(distPath, "index.html");
+  const hasDist = fs.existsSync(indexHtmlPath);
+
+  // In production (or when dist/index.html is pre-built), serve static build files directly
+  if (process.env.NODE_ENV === "production" || hasDist) {
+    app.use(express.static(distPath));
+    app.get("*", (_req, res) => {
+      res.sendFile(indexHtmlPath);
+    });
+  } else {
+    // In dev mode without pre-built dist, mount Vite middlewares
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
     });
     app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(process.cwd(), "dist");
-    app.use(express.static(distPath));
-    app.get("*", (_req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
-    });
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Chess Verse Server running on http://0.0.0.0:${PORT}`);
+    console.log(`ChessVerse Server running on port ${PORT}`);
   });
 }
 
