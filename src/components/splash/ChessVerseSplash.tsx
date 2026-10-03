@@ -8,23 +8,12 @@ import { IntroTimelineController, IntroTimelineState } from './IntroTimelineCont
 import { soundService } from '../../services/sound';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useNavigationStore } from '../../store/navigationStore';
+import { checkWebGLAvailability } from '../../services/threeDAssetPreloader';
+import { useAppLoadingState } from '../loading/AppLoadingManager';
 
 interface ChessVerseSplashProps {
   onComplete: () => void;
   autoPlaySound?: boolean;
-}
-
-function checkWebGLSupport(): boolean {
-  if (typeof window === 'undefined') return true;
-  try {
-    const canvas = document.createElement('canvas');
-    return !!(
-      window.WebGLRenderingContext &&
-      (canvas.getContext('webgl') || canvas.getContext('experimental-webgl'))
-    );
-  } catch {
-    return false;
-  }
 }
 
 export const ChessVerseSplash: React.FC<ChessVerseSplashProps> = ({
@@ -33,7 +22,8 @@ export const ChessVerseSplash: React.FC<ChessVerseSplashProps> = ({
 }) => {
   const { sound, graphics } = useSettingsStore();
   const { setSplashMorphProgress } = useNavigationStore();
-  const [webglSupported] = useState<boolean>(() => checkWebGLSupport());
+  const { isWebGLSupported } = useAppLoadingState();
+  const [webglSupported] = useState<boolean>(() => isWebGLSupported && checkWebGLAvailability());
 
   // Check prefers-reduced-motion
   const [reducedMotion, setReducedMotion] = useState(false);
